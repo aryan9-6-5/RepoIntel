@@ -222,15 +222,4 @@ Contributions are welcome! To contribute:
 
 Please ensure your code follows the project's coding standards and includes appropriate tests.
 
-
-## Contact
-
-**Aryan Hanumakonda**
-
-- GitHub: [@aryanhanumakonda](https://github.com/aryan9-6-5)
-- LinkedIn: [aryanhanumakonda](https://www.linkedin.com/in/aryan-hanumakonda-37765928b/)
-- Email: aryan@example.com
-
-For questions or support, please open an issue on GitHub or reach out via email.
-
 ---
