@@ -1,0 +1,4 @@
+project_id = "fvzzdeohmfihphkmiako"
+
+[functions.summarize-repo]
+verify_jwt = false
