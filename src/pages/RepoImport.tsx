@@ -165,7 +165,7 @@ export default function RepoImport() {
     <main className="container mx-auto max-w-3xl px-4 py-10">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground">Import a repository</h1>
-        <Link to="/" className="text-sm text-primary hover:underline">
+        <Link to="/" className="inline-flex min-h-[40px] items-center text-sm text-primary hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary md:min-h-[28px]">
           Profile explorer
         </Link>
       </div>
@@ -239,7 +239,7 @@ export default function RepoImport() {
               {analysis.findings.map((f) => (
                 <div key={f.rule + f.line + f.title} className="rounded border border-border p-2">
                   <p className="text-foreground">
-                    <button type="button" className="text-primary underline" onClick={() => { setSelected(analysis.path); setHl([f.line, f.line]); }}>line {f.line}</button>: {f.title} <span className="text-xs text-muted-foreground">[{f.severity}, {f.kind === 'static' ? 'pattern match' : 'unverified model hypothesis'}, confidence {f.confidence}]</span>
+                    <button type="button" className="inline-block min-h-[28px] text-primary underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary" onClick={() => { setSelected(analysis.path); setHl([f.line, f.line]); }}>line {f.line}</button>: {f.title} <span className="text-xs text-muted-foreground">[{f.severity}, {f.kind === 'static' ? 'pattern match' : 'unverified model hypothesis'}, confidence {f.confidence}]</span>
                   </p>
                   <pre className="my-1 overflow-auto rounded bg-secondary/50 p-1 text-xs">{f.evidence}</pre>
                   <p className="text-xs text-muted-foreground">{f.rationale}</p>
@@ -272,7 +272,7 @@ export default function RepoImport() {
               <p className="text-muted-foreground">
                 Entry points:{' '}
                 {explorer.overview.entryPoints.length === 0 ? 'none detected' : explorer.overview.entryPoints.map((p) => (
-                  <button key={p} type="button" className="mr-2 text-primary underline" onClick={() => { setSelected(p); setHl(null); }}>{p}</button>
+                  <button key={p} type="button" className="mr-2 inline-block min-h-[28px] text-primary underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary md:min-h-[24px]" onClick={() => { setSelected(p); setHl(null); }}>{p}</button>
                 ))}
               </p>
               {explorer.dependencies.map((d) => (
