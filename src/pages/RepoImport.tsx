@@ -19,6 +19,13 @@ interface Answer {
   citations: { valid: string[]; invalid: string[]; grounded: boolean };
 }
 
+interface FindingT {
+  rule: string; title: string; line: number; severity: string; kind: 'static' | 'hypothesis';
+  confidence: string; evidence: string; rationale: string;
+}
+
+interface Proposal { path: string; commitSha: string; diff: string; edit: { startLine: number; endLine: number; newText: string } }
+
 interface IngestSuccess {
   repoId: string;
   defaultBranch: string;
@@ -68,6 +75,38 @@ export default function RepoImport() {
     } finally {
       setAsking(false);
     }
+  };
+
+  const [analysis, setAnalysis] = useState<{ path: string; commitSha: string; findings: FindingT[]; llmStatus: string } | null>(null);
+  const [proposal, setProposal] = useState<Proposal | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const call = async <T,>(name: string, body: object, label: string): Promise<T | null> => {
+    setError(null);
+    setBusy(label);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke(name, { body });
+      if (fnError) throw fnError;
+      return data as T;
+    } catch (err) {
+      setError(await readFunctionError(err));
+      return null;
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const analyze = async (path: string) => {
+    setProposal(null);
+    setAnalysis(null);
+    const r = await call<{ commitSha: string; findings: FindingT[]; llmStatus: string }>('repo-analyze', { repo: input, path, llm: true }, path);
+    if (r) setAnalysis({ path, ...r });
+  };
+
+  const propose = async (f: FindingT) => {
+    if (!analysis) return;
+    const r = await call<Proposal>('repo-patch', { repo: input, path: analysis.path, line: f.line, title: f.title, rationale: f.rationale }, `fix-${f.line}`);
+    if (r) setProposal(r);
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -151,12 +190,46 @@ export default function RepoImport() {
               ))}
             </div>
           )}
+          {analysis && (
+            <div className="space-y-3 rounded-lg border border-border bg-card p-4 text-sm">
+              <p className="font-semibold text-foreground">Findings: {analysis.path} @ {analysis.commitSha.slice(0, 7)}</p>
+              {analysis.findings.length === 0 && <p className="text-muted-foreground">No findings. This is not proof the file is bug-free.</p>}
+              {analysis.findings.map((f) => (
+                <div key={f.rule + f.line + f.title} className="rounded border border-border p-2">
+                  <p className="text-foreground">
+                    line {f.line}: {f.title} <span className="text-xs text-muted-foreground">[{f.severity}, {f.kind === 'static' ? 'pattern match' : 'unverified model hypothesis'}, confidence {f.confidence}]</span>
+                  </p>
+                  <pre className="my-1 overflow-auto rounded bg-secondary/50 p-1 text-xs">{f.evidence}</pre>
+                  <p className="text-xs text-muted-foreground">{f.rationale}</p>
+                  <Button size="sm" variant="outline" className="mt-1" disabled={!!busy} onClick={() => propose(f)}>
+                    {busy === `fix-${f.line}` ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Propose fix'}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+          {proposal && (
+            <div className="space-y-2 rounded-lg border border-primary/40 bg-card p-4 text-sm">
+              <p className="font-semibold text-foreground">Proposed patch (unverified, nothing applied)</p>
+              <pre className="max-h-72 overflow-auto rounded bg-secondary/50 p-2 text-xs">{proposal.diff}</pre>
+              <p className="text-xs text-muted-foreground">
+                To verify in an isolated local Docker sandbox, save this response as patch.json and run:
+              </p>
+              <pre className="overflow-auto rounded bg-secondary/50 p-2 text-xs">{`node scripts/verify-patch.mjs ${result.repoId} ${proposal.commitSha} patch.json "npm test"`}</pre>
+              <Button size="sm" variant="outline" onClick={() => navigator.clipboard?.writeText(JSON.stringify({ path: proposal.path, edit: proposal.edit }, null, 2))}>
+                Copy patch.json
+              </Button>
+            </div>
+          )}
           <ul className="max-h-[28rem] divide-y divide-border overflow-y-auto rounded-lg border border-border bg-card">
             {result.files.map((f) => (
               <li key={f.sha + f.path} className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground">
                 <FileCode2 className="h-4 w-4 shrink-0 text-primary" />
                 <span className="truncate text-foreground">{f.path}</span>
                 <span className="ml-auto shrink-0 text-xs">{f.size ?? 0} B</span>
+                <Button size="sm" variant="outline" disabled={!!busy} onClick={() => analyze(f.path)}>
+                  {busy === f.path ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Analyze'}
+                </Button>
               </li>
             ))}
           </ul>

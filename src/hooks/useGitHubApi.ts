@@ -45,30 +45,26 @@ export function useGitHubApi() {
   }, []);
 
   const fetchUser = useCallback(async (username: string): Promise<GitHubUser | null> => {
-    try {
-      const response = await fetch(`${GITHUB_API_BASE}/users/${username}`);
-      updateRateLimit(response.headers);
-      
-      if (response.status === 404) {
-        throw new Error('User not found. Please check the username and try again.');
-      }
-      
-      if (response.status === 403) {
-        const resetTime = response.headers.get('x-ratelimit-reset');
-        const resetDate = resetTime ? new Date(parseInt(resetTime, 10) * 1000) : null;
-        throw new Error(
-          `API rate limit exceeded.${resetDate ? ` Try again after ${resetDate.toLocaleTimeString()}.` : ''}`
-        );
-      }
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch user data. Please try again.');
-      }
-      
-      return await response.json();
-    } catch (err) {
-      throw err;
+    const response = await fetch(`${GITHUB_API_BASE}/users/${username}`);
+    updateRateLimit(response.headers);
+    
+    if (response.status === 404) {
+      throw new Error('User not found. Please check the username and try again.');
     }
+    
+    if (response.status === 403) {
+      const resetTime = response.headers.get('x-ratelimit-reset');
+      const resetDate = resetTime ? new Date(parseInt(resetTime, 10) * 1000) : null;
+      throw new Error(
+        `API rate limit exceeded.${resetDate ? ` Try again after ${resetDate.toLocaleTimeString()}.` : ''}`
+      );
+    }
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch user data. Please try again.');
+    }
+    
+    return await response.json();
   }, [updateRateLimit]);
 
   const fetchRepositories = useCallback(async (
@@ -76,36 +72,32 @@ export function useGitHubApi() {
     page: number = 1,
     perPage: number = 30
   ): Promise<{ repos: GitHubRepository[]; hasMore: boolean }> => {
-    try {
-      const response = await fetch(
-        `${GITHUB_API_BASE}/users/${username}/repos?page=${page}&per_page=${perPage}&sort=updated`
-      );
-      updateRateLimit(response.headers);
-      
-      if (response.status === 404) {
-        throw new Error('User not found.');
-      }
-      
-      if (response.status === 403) {
-        const resetTime = response.headers.get('x-ratelimit-reset');
-        const resetDate = resetTime ? new Date(parseInt(resetTime, 10) * 1000) : null;
-        throw new Error(
-          `API rate limit exceeded.${resetDate ? ` Try again after ${resetDate.toLocaleTimeString()}.` : ''}`
-        );
-      }
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch repositories.');
-      }
-      
-      const repos: GitHubRepository[] = await response.json();
-      const linkHeader = response.headers.get('link');
-      const hasMore = linkHeader?.includes('rel="next"') ?? false;
-      
-      return { repos, hasMore };
-    } catch (err) {
-      throw err;
+    const response = await fetch(
+      `${GITHUB_API_BASE}/users/${username}/repos?page=${page}&per_page=${perPage}&sort=updated`
+    );
+    updateRateLimit(response.headers);
+    
+    if (response.status === 404) {
+      throw new Error('User not found.');
     }
+    
+    if (response.status === 403) {
+      const resetTime = response.headers.get('x-ratelimit-reset');
+      const resetDate = resetTime ? new Date(parseInt(resetTime, 10) * 1000) : null;
+      throw new Error(
+        `API rate limit exceeded.${resetDate ? ` Try again after ${resetDate.toLocaleTimeString()}.` : ''}`
+      );
+    }
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch repositories.');
+    }
+    
+    const repos: GitHubRepository[] = await response.json();
+    const linkHeader = response.headers.get('link');
+    const hasMore = linkHeader?.includes('rel="next"') ?? false;
+    
+    return { repos, hasMore };
   }, [updateRateLimit]);
 
   const fetchAllRepositories = useCallback(async (username: string): Promise<GitHubRepository[]> => {
