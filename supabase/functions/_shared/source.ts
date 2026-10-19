@@ -5,7 +5,7 @@ import { parseRepoRef } from './repoUrl.ts';
 export const MAX_INLINE_CHARS = 60_000;
 
 export type Source =
-  | { ok: true; text: string; path: string; repoId: string; commitSha: string }
+  | { ok: true; text: string; path: string; repoId: string; commitSha: string; paths: string[]; read: (p: string) => Promise<string | null> }
   | { ok: false; status: number; error: string };
 
 type FetchFn = (url: string, init?: { headers?: Record<string, string> }) => Promise<Response>;
@@ -25,7 +25,7 @@ export async function loadSource(
 
   if (typeof body.content === 'string') {
     if (body.content.length > MAX_INLINE_CHARS) return { ok: false, status: 413, error: 'Inline content too large.' };
-    return { ok: true, text: body.content, path, repoId: 'inline', commitSha: 'inline' };
+    return { ok: true, text: body.content, path, repoId: 'inline', commitSha: 'inline', paths: [], read: async () => null };
   }
 
   const ref = typeof body.repo === 'string' ? parseRepoRef(body.repo) : null;
@@ -33,8 +33,10 @@ export async function loadSource(
   const ing = await ingestRepo(ref, doFetch, token, cache);
   if (!ing.ok) return { ok: false, status: ing.code === 'not_found' ? 404 : ing.code === 'rate_limited' ? 429 : 413, error: ing.message };
   if (!ing.files.some((x) => x.path === path)) return { ok: false, status: 404, error: 'File not found in the indexed set.' };
-  const url = `https://raw.githubusercontent.com/${encodeURIComponent(ref.owner)}/${encodeURIComponent(ref.repo)}/${ing.commitSha}/${path.split('/').map(encodeURIComponent).join('/')}`;
-  const r = await doFetch(url);
+  const rawUrl = (p: string) => `https://raw.githubusercontent.com/${encodeURIComponent(ref.owner)}/${encodeURIComponent(ref.repo)}/${ing.commitSha}/${p.split('/').map(encodeURIComponent).join('/')}`;
+  const r = await doFetch(rawUrl(path));
   if (!r.ok) return { ok: false, status: 502, error: 'Could not read file.' };
-  return { ok: true, text: await r.text(), path, repoId: ing.repoId, commitSha: ing.commitSha };
+  const paths = ing.files.map((x) => x.path);
+  const read = async (p: string) => { if (!paths.includes(p)) return null; const x = await doFetch(rawUrl(p)); return x.ok ? await x.text() : null; };
+  return { ok: true, text: await r.text(), path, repoId: ing.repoId, commitSha: ing.commitSha, paths, read };
 }

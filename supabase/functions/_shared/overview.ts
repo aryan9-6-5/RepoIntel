@@ -72,6 +72,15 @@ export function overviewFromPaths(paths: string[]): Overview {
   };
 }
 
+/** Up to `limit` dependency manifests: shallow paths first, fixtures/tests/docs last (so the project's own manifest wins). */
+export function pickManifests(configFiles: string[], limit = 3): string[] {
+  const aux = (p: string) => /(^|\/)(tests?|__tests__|spec|examples?|fixtures?|docs?|benchmarks?)\//i.test(p);
+  return configFiles
+    .filter((p) => /(^|\/)(package\.json|requirements\.txt|go\.mod)$/i.test(p))
+    .sort((a, b) => Number(aux(a)) - Number(aux(b)) || a.split('/').length - b.split('/').length || (a < b ? -1 : 1))
+    .slice(0, limit);
+}
+
 export interface Dependencies {
   source: string;
   runtime: string[];

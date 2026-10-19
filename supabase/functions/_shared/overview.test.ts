@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildTree, overviewFromPaths, parseManifest } from './overview.ts';
+import { buildTree, overviewFromPaths, parseManifest, pickManifests } from './overview.ts';
 
 describe('buildTree', () => {
   it('nests paths, dirs first then alphabetical', () => {
@@ -30,5 +30,12 @@ describe('parseManifest', () => {
     expect(parseManifest('go.mod', 'module x\nrequire (\n  github.com/a/b v1.2.3\n)')?.runtime).toEqual(['github.com/a/b']);
     expect(parseManifest('package.json', '{bad')).toBeNull();
     expect(parseManifest('README.md', 'x')).toBeNull();
+  });
+});
+
+describe('pickManifests', () => {
+  it('prefers the root manifest over fixtures and nested ones', () => {
+    const cfg = ['eval/fixtures/a/package.json', 'packages/x/package.json', 'package.json', 'eval/fixtures/b/package.json', 'README.md'];
+    expect(pickManifests(cfg)).toEqual(['package.json', 'packages/x/package.json', 'eval/fixtures/a/package.json']);
   });
 });

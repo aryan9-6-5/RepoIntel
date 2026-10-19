@@ -1,8 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { buildMessages, checkCitations } from "../_shared/answer.ts";
 import { ingestRepo, type IngestResult } from "../_shared/ingest.ts";
-import { TtlCache, clientIp, rateLimited } from "../_shared/limits.ts";
-import { buildTree, overviewFromPaths, parseManifest } from "../_shared/overview.ts";
+import { TtlCache, clientIp, overLimit } from "../_shared/limits.ts";
+import { buildTree, overviewFromPaths, parseManifest, pickManifests } from "../_shared/overview.ts";
 import { parseRepoRef } from "../_shared/repoUrl.ts";
 import { chunkFile, type Chunk } from "../_shared/search.ts";
 import { corsHeadersFor } from "../_shared/validate.ts";
@@ -17,7 +17,7 @@ serve(async (req) => {
     new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
-  if (rateLimited(clientIp(req))) return json({ error: "Too many requests. Please wait a minute." }, 429);
+  if (await overLimit(clientIp(req), { url: Deno.env.get("SUPABASE_URL"), key: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") }, fetch, 20, 60, (m) => console.error(m))) return json({ error: "Too many requests. Please wait a minute." }, 429);
 
   try {
     const raw = await req.text();
@@ -39,7 +39,7 @@ serve(async (req) => {
     const read = async (p: string) => { const r = await f(rawUrl(p)); return r.ok ? await r.text() : null; };
 
     // Manifests -> dependencies (deterministic parsing; content is untrusted data, never executed)
-    const manifests = overview.configFiles.filter((p) => /(^|\/)(package\.json|requirements\.txt|go\.mod)$/i.test(p)).slice(0, 3);
+    const manifests = pickManifests(overview.configFiles);
     const manifestTexts = await Promise.all(manifests.map(async (p) => [p, await read(p)] as const));
     const dependencies = manifestTexts.flatMap(([p, t]) => (t ? [parseManifest(p, t)] : [])).filter((d) => d !== null);
 
