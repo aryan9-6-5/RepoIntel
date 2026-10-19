@@ -1,0 +1,8 @@
+[
+  { "fixture": "sum-range", "file": "src/sum.js", "bugs": [{ "lines": [4, 4], "desc": "loop excludes upper bound (i < b)" }], "expectFail": true },
+  { "fixture": "clamp", "file": "src/clamp.js", "bugs": [{ "lines": [3, 4], "desc": "min/max swapped in returns" }], "expectFail": true },
+  { "fixture": "average", "file": "src/average.js", "bugs": [{ "lines": [5, 5], "desc": "divides by length-1" }], "expectFail": true },
+  { "fixture": "slugify", "file": "src/slugify.js", "bugs": [{ "lines": [3, 3], "desc": "trailing hyphen not stripped" }], "expectFail": true },
+  { "fixture": "clean", "file": "src/even.js", "bugs": [], "expectFail": false },
+  { "fixture": "insecure", "file": "src/app.js", "bugs": [{ "lines": [1, 1], "rule": "hardcoded-secret" }, { "lines": [4, 4], "rule": "eval" }, { "lines": [8, 8], "rule": "html-injection" }, { "lines": [12, 12], "rule": "empty-catch" }], "expectFail": false }
+]
