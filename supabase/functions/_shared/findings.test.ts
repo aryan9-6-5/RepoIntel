@@ -6,7 +6,7 @@ const SEEDED = [
   'export function run(input) {',
   '  return eval(input);',
   '}',
-  'const apiKey = "sk_live_abcdefgh12345678";',
+  'const apiKey = "EXAMPLE_NOT_A_REAL_KEY";',
   'try { risky(); } catch (e) {}',
   'el.innerHTML = userText;',
   'if (user = admin) { grant(); }',

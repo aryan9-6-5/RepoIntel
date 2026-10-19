@@ -18,6 +18,29 @@ describe('rankPaths', () => {
   });
 });
 
+describe('rankPaths abbreviations', () => {
+  it('matches a term that abbreviates a path word', () => {
+    expect(rankPaths(['lib/util.js', 'lib/response.js', 'lib/application.js'], 'res.cookie options', 1)).toEqual(['lib/response.js']);
+    expect(rankPaths(['lib/util.js', 'lib/response.js', 'lib/application.js'], 'app.use middleware', 1)).toEqual(['lib/application.js']);
+  });
+});
+
+describe('test files rank below source', () => {
+  it('prefers source over a same-named test path', () => {
+    expect(rankPaths(['test/res.cookie.js', 'lib/response.js'], 'res.cookie', 1)).toEqual(['lib/response.js']);
+  });
+});
+
+describe('searchChunks resists repetition', () => {
+  it('a changelog repeating a term does not outrank source covering all terms', () => {
+    const cs = [
+      { path: 'History.md', start: 1, end: 5, text: 'res.cookie res.cookie res.cookie res.cookie res.cookie res.cookie' },
+      { path: 'lib/response.js', start: 1, end: 5, text: 'res.cookie = function (name, value, options) { set cookie options }' },
+    ];
+    expect(searchChunks(cs, 'res.cookie set cookie options', 1)[0].path).toBe('lib/response.js');
+  });
+});
+
 describe('searchChunks', () => {
   it('ranks chunks by term hits and returns nothing without evidence', () => {
     const cs = [
