@@ -1,9 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { staticChecks, validateHypotheses } from "../_shared/findings.ts";
-import { ingestRepo } from "../_shared/ingest.ts";
+import { ingestRepo, type IngestResult } from "../_shared/ingest.ts";
+import { TtlCache, clientIp, rateLimited } from "../_shared/limits.ts";
 import { parseRepoRef } from "../_shared/repoUrl.ts";
 import { corsHeadersFor } from "../_shared/validate.ts";
 
+const treeCache = new TtlCache<IngestResult>(300_000); // 5 min: saves GitHub quota
 const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ??
   "http://localhost:8080,http://localhost:5173").split(",").map((s) => s.trim());
 
@@ -13,6 +15,7 @@ serve(async (req) => {
     new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+  if (rateLimited(clientIp(req))) return json({ error: "Too many requests. Please wait a minute." }, 429);
 
   try {
     const raw = await req.text();
@@ -25,7 +28,7 @@ serve(async (req) => {
 
     const f = (url: string, init?: { headers?: Record<string, string> }) =>
       fetch(url, { ...init, signal: AbortSignal.timeout(15_000) });
-    const ing = await ingestRepo(ref, f, Deno.env.get("GITHUB_TOKEN") ?? undefined);
+    const ing = await ingestRepo(ref, f, Deno.env.get("GITHUB_TOKEN") ?? undefined, treeCache);
     if (!ing.ok) return json({ error: ing.message, code: ing.code }, ing.code === "not_found" ? 404 : ing.code === "rate_limited" ? 429 : 413);
     // Only analyze files from the vetted tree (blocks arbitrary-URL fetches).
     if (!ing.files.some((x) => x.path === path)) return json({ error: "File not found in the indexed set." }, 404);

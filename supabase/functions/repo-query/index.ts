@@ -1,10 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { ingestRepo } from "../_shared/ingest.ts";
+import { ingestRepo, type IngestResult } from "../_shared/ingest.ts";
+import { TtlCache, clientIp, rateLimited } from "../_shared/limits.ts";
 import { parseRepoRef } from "../_shared/repoUrl.ts";
 import { buildMessages, checkCitations } from "../_shared/answer.ts";
 import { chunkFile, rankPaths, searchChunks } from "../_shared/search.ts";
 import { corsHeadersFor } from "../_shared/validate.ts";
 
+const treeCache = new TtlCache<IngestResult>(300_000); // 5 min: saves GitHub quota
 const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ??
   "http://localhost:8080,http://localhost:5173").split(",").map((s) => s.trim());
 const MAX_FILES = 15; // bounds GitHub calls and CPU per request
@@ -15,6 +17,7 @@ serve(async (req) => {
     new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+  if (rateLimited(clientIp(req))) return json({ error: "Too many requests. Please wait a minute." }, 429);
 
   try {
     const raw = await req.text();
@@ -28,7 +31,7 @@ serve(async (req) => {
     const token = Deno.env.get("GITHUB_TOKEN") ?? undefined;
     const f = (url: string, init?: { headers?: Record<string, string> }) =>
       fetch(url, { ...init, signal: AbortSignal.timeout(15_000) });
-    const ing = await ingestRepo(ref, f, token);
+    const ing = await ingestRepo(ref, f, token, treeCache);
     if (!ing.ok) return json({ error: ing.message, code: ing.code }, ing.code === "not_found" ? 404 : ing.code === "rate_limited" ? 429 : 413);
 
     const paths = rankPaths(ing.files.map((x) => x.path), query, MAX_FILES);

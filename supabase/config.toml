@@ -14,3 +14,6 @@ verify_jwt = true
 
 [functions.repo-analyze]
 verify_jwt = true
+
+[functions.repo-patch]
+verify_jwt = true

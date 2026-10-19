@@ -1,4 +1,5 @@
 import { selectFiles, type SelectResult, type TreeEntry } from './fileFilter.ts';
+import type { TtlCache } from './limits.ts';
 import { repoId, type RepoRef } from './repoUrl.ts';
 
 /** Repositories larger than this (GitHub-reported KB) are refused before the tree is fetched. */
@@ -35,7 +36,15 @@ function rateLimit(res: Response): IngestResult | null {
  * Enumerate indexable files of a PUBLIC repository using only GitHub REST metadata.
  * Never downloads archives and never executes anything.
  */
-export async function ingestRepo(ref: RepoRef, doFetch: FetchFn, token?: string): Promise<IngestResult> {
+export async function ingestRepo(ref: RepoRef, doFetch: FetchFn, token?: string, cache?: TtlCache<IngestResult>): Promise<IngestResult> {
+  const hit = cache?.get(repoId(ref));
+  if (hit) return hit;
+  const result = await ingestUncached(ref, doFetch, token);
+  if (result.ok) cache?.set(repoId(ref), result);
+  return result;
+}
+
+async function ingestUncached(ref: RepoRef, doFetch: FetchFn, token?: string): Promise<IngestResult> {
   const headers: Record<string, string> = { Accept: 'application/vnd.github+json', 'User-Agent': 'RepoPilot' };
   if (token) headers.Authorization = `Bearer ${token}`;
   const base = `${API}/repos/${encodeURIComponent(ref.owner)}/${encodeURIComponent(ref.repo)}`;
