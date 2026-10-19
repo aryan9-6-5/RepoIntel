@@ -13,7 +13,8 @@ import {
   AlertCircle,
   HardDrive,
   Sparkles,
-  Loader2
+  Loader2,
+  type LucideIcon
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useState, useEffect } from 'react';
@@ -161,7 +162,7 @@ export function RepoDetailModal({ repo, open, onClose }: RepoDetailModalProps) {
   );
 }
 
-function StatCard({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
+function StatCard({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
     <div className="bg-secondary/50 rounded-lg p-3 text-center">
       <Icon className="h-5 w-5 mx-auto text-primary mb-1" />
@@ -171,7 +172,7 @@ function StatCard({ icon: Icon, label, value }: { icon: any; label: string; valu
   );
 }
 
-function InfoRow({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
+function InfoRow({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
     <div className="flex items-center gap-2 text-muted-foreground">
       <Icon className="h-4 w-4 shrink-0" />

@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Github } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { ProfileInput } from '@/components/ProfileInput';
 import { UserProfile } from '@/components/UserProfile';
 import { RepoFilters } from '@/components/RepoFilters';
@@ -172,6 +173,9 @@ export default function Index() {
               Discover and explore public repositories from any GitHub profile. 
               Search, filter, sort, and export repository data with ease.
             </p>
+            <Link to="/import" className="mt-4 inline-block text-sm text-primary hover:underline">
+              RepoPilot: import a repository to analyze its source
+            </Link>
           </div>
 
           <ProfileInput onSubmit={handleSearch} loading={loading} />

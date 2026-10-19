@@ -1,4 +1,16 @@
-project_id = "fvzzdeohmfihphkmiako"
+project_id = "hftgejaodmbmuvsqspon"
 
+# JWT verification on: browser calls send the publishable (anon) key via supabase-js,
+# so the UI keeps working while arbitrary unauthenticated callers are rejected.
+# NOTE: takes effect only on deploy, which requires explicit approval (see docs/HANDOFF.md).
 [functions.summarize-repo]
-verify_jwt = false
+verify_jwt = true
+
+[functions.repo-ingest]
+verify_jwt = true
+
+[functions.repo-query]
+verify_jwt = true
+
+[functions.repo-analyze]
+verify_jwt = true
