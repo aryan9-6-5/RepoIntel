@@ -14,6 +14,7 @@ React + Vite UI --supabase-js--> Supabase Edge Functions (Deno, JWT-verified, CO
   repo-query    path ranking + raw fetch at pinned commit + line-exact chunks + keyword scoring (+ Groq answer, citations verified)
   repo-analyze  5 static rules + optional Groq hypotheses (validated to real lines)
   repo-patch    Groq proposes a line-range edit; server validates it and renders a diff
+  repo-overview languages, entry points, dependencies, file tree, optional grounded architecture summary
   summarize-repo  (original) profile/repo summary
 scripts/verify-patch.mjs  local Docker: install --ignore-scripts, tests --network none, baseline vs patched
 scripts/eval.mjs          live benchmark -> docs/EVAL.md
@@ -28,9 +29,11 @@ cp .env.example .env        # fill VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHAB
 npx supabase login
 npx supabase secrets set GROQ_API_KEY=... ALLOWED_ORIGINS=http://localhost:8080 --project-ref <ref>
 # optional, raises GitHub quota from 60/h: npx supabase secrets set GITHUB_TOKEN=<read-only token> --project-ref <ref>
-for f in summarize-repo repo-ingest repo-query repo-analyze repo-patch; do npx supabase functions deploy $f --project-ref <ref>; done
+npx supabase db push --project-ref <ref>   # global rate-limit table (see docs/DEPLOY.md)
+for f in summarize-repo repo-ingest repo-query repo-analyze repo-patch repo-overview; do npx supabase functions deploy $f --project-ref <ref>; done
 npm run dev                 # http://localhost:8080
 ```
+Notes: `.npmrc` sets `legacy-peer-deps=true` (needed for the Vite 6 / plugin peer ranges) and `@swc/core` is pinned to 1.13.5 (newer versions fail to load on some Windows machines).
 Secrets live only in Supabase secrets; the browser gets only the Supabase URL and publishable key. Set `ALLOWED_ORIGINS`
 to your production origin(s) (comma-separated) before deploying a frontend.
 
@@ -45,4 +48,4 @@ to your production origin(s) (comma-separated) before deploying a frontend.
 - See `docs/EVAL.md` for the (small) benchmark and `docs/PROGRESS.md` for known issues.
 
 ## Docs
-`CLAUDE.md`, `docs/PROJECT_PLAN.md`, `DECISIONS.md`, `PROGRESS.md`, `CHANGELOG.md`, `HANDOFF.md`, `TESTING.md`, `EVAL.md`.
+`CLAUDE.md`, `docs/PROJECT_PLAN.md`, `DECISIONS.md`, `PROGRESS.md`, `CHANGELOG.md`, `HANDOFF.md`, `TESTING.md`, `DEPLOY.md`, `SECURITY.md`, `EVAL.md`, `EVAL-BUGS.md`, `EVAL-REAL.md`, `EVAL-CONTEXT.md`.

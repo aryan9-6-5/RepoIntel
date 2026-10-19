@@ -1,8 +1,167 @@
 [
-  { "fixture": "sum-range", "file": "src/sum.js", "bugs": [{ "lines": [4, 4], "desc": "loop excludes upper bound (i < b)" }], "expectFail": true },
-  { "fixture": "clamp", "file": "src/clamp.js", "bugs": [{ "lines": [3, 4], "desc": "min/max swapped in returns" }], "expectFail": true },
-  { "fixture": "average", "file": "src/average.js", "bugs": [{ "lines": [5, 5], "desc": "divides by length-1" }], "expectFail": true },
-  { "fixture": "slugify", "file": "src/slugify.js", "bugs": [{ "lines": [3, 3], "desc": "trailing hyphen not stripped" }], "expectFail": true },
-  { "fixture": "clean", "file": "src/even.js", "bugs": [], "expectFail": false },
-  { "fixture": "insecure", "file": "src/app.js", "bugs": [{ "lines": [1, 1], "rule": "hardcoded-secret" }, { "lines": [4, 4], "rule": "eval" }, { "lines": [8, 8], "rule": "html-injection" }, { "lines": [12, 12], "rule": "empty-catch" }], "expectFail": false }
+  {
+    "fixture": "sum-range",
+    "file": "src/sum.js",
+    "bugs": [
+      {
+        "lines": [
+          4,
+          4
+        ],
+        "desc": "loop excludes upper bound (i < b)"
+      }
+    ],
+    "expectFail": true
+  },
+  {
+    "fixture": "clamp",
+    "file": "src/clamp.js",
+    "bugs": [
+      {
+        "lines": [
+          3,
+          4
+        ],
+        "desc": "min/max swapped in returns"
+      }
+    ],
+    "expectFail": true
+  },
+  {
+    "fixture": "average",
+    "file": "src/average.js",
+    "bugs": [
+      {
+        "lines": [
+          5,
+          5
+        ],
+        "desc": "divides by length-1"
+      }
+    ],
+    "expectFail": true
+  },
+  {
+    "fixture": "slugify",
+    "file": "src/slugify.js",
+    "bugs": [
+      {
+        "lines": [
+          3,
+          3
+        ],
+        "desc": "trailing hyphen not stripped"
+      }
+    ],
+    "expectFail": true
+  },
+  {
+    "fixture": "clean",
+    "file": "src/even.js",
+    "bugs": [],
+    "expectFail": false
+  },
+  {
+    "fixture": "insecure",
+    "file": "src/app.js",
+    "bugs": [
+      {
+        "lines": [
+          1,
+          1
+        ],
+        "rule": "hardcoded-secret"
+      },
+      {
+        "lines": [
+          4,
+          4
+        ],
+        "rule": "eval"
+      },
+      {
+        "lines": [
+          8,
+          8
+        ],
+        "rule": "html-injection"
+      },
+      {
+        "lines": [
+          12,
+          12
+        ],
+        "rule": "empty-catch"
+      }
+    ],
+    "expectFail": false
+  },
+  {
+    "fixture": "xfile-discount",
+    "file": "src/cart.js",
+    "context": [
+      "src/pricing.js"
+    ],
+    "bugs": [
+      {
+        "lines": [
+          4,
+          4
+        ],
+        "desc": "arguments swapped vs applyDiscount(price, ratePercent)"
+      }
+    ],
+    "expectFail": true
+  },
+  {
+    "fixture": "xfile-find",
+    "file": "src/greet.js",
+    "context": [
+      "src/store.js"
+    ],
+    "bugs": [
+      {
+        "lines": [
+          5,
+          5
+        ],
+        "desc": "findUser can return null; user.name unguarded"
+      }
+    ],
+    "expectFail": true
+  },
+  {
+    "fixture": "xfile-index",
+    "file": "src/pick.js",
+    "context": [
+      "src/lookup.js"
+    ],
+    "bugs": [
+      {
+        "lines": [
+          5,
+          6
+        ],
+        "desc": "positionOf is 1-based; list[i+1] skips an element"
+      }
+    ],
+    "expectFail": true
+  },
+  {
+    "fixture": "xfile-units",
+    "file": "src/session.js",
+    "context": [
+      "src/clock.js"
+    ],
+    "bugs": [
+      {
+        "lines": [
+          6,
+          6
+        ],
+        "desc": "elapsed() returns seconds; compared against milliseconds"
+      }
+    ],
+    "expectFail": true
+  }
 ]

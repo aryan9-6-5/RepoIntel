@@ -1,0 +1,255 @@
+[
+  {
+    "repo": "axios/axios",
+    "fixSha": "878bb29de570765b0d4c0970e30400d9ea9399f7",
+    "parentSha": "a092bae50d1884782151b2fcea12974d6da6e376",
+    "path": "sandbox/server.js",
+    "message": "fix(sandbox): resolve TypeError on constant variable path assignment (#11073)",
+    "buggyLines": [
+      79,
+      80
+    ],
+    "fileLines": 131
+  },
+  {
+    "repo": "axios/axios",
+    "fixSha": "32e2515f1e09b649723e4acd89d920df13eee77e",
+    "parentSha": "030e7223831b0f562af3eb7501b24242c8a4c5ba",
+    "path": "scripts/axios-build-instance.js",
+    "message": "fix: replace ternary side effect in script (#10931)",
+    "buggyLines": [
+      5,
+      6,
+      22,
+      23
+    ],
+    "fileLines": 25
+  },
+  {
+    "repo": "axios/axios",
+    "fixSha": "b0771a3c3e6f2bcefd4168f64cf24e454a7fb77a",
+    "parentSha": "67e10e7976b19979234c0665ee921ff38ec8951d",
+    "path": "lib/helpers/resolveConfig.js",
+    "message": "fix: convert resolveConfig default export to named function for webpack/babel compatibility (#10891)",
+    "buggyLines": [
+      38,
+      39,
+      106,
+      107
+    ],
+    "fileLines": 107
+  },
+  {
+    "repo": "axios/axios",
+    "fixSha": "17b90d0be692f1704e4623731163285b0480520f",
+    "parentSha": "37cf18f2e2c10171ddd851c8e46938d48cc35948",
+    "path": "lib/core/mergeConfig.js",
+    "message": "fix(security): guard mergeConfig value reads with hasOwnProp",
+    "buggyLines": [
+      102,
+      103
+    ],
+    "fileLines": 108
+  },
+  {
+    "repo": "lodash/lodash",
+    "fixSha": "30863e5fa69471fc50743fffca7d1d7c4d0d2626",
+    "parentSha": "6672a4f9427f82d2602f6ef5205d1752c3667bf4",
+    "path": "lib/main/build-site.js",
+    "message": "Fix conversion of npm package and source doc links. [ci skip]",
+    "buggyLines": [
+      178,
+      179
+    ],
+    "fileLines": 221
+  },
+  {
+    "repo": "sindresorhus/got",
+    "fixSha": "ecb05343dea3bd35933585a1ec5bcea01348d109",
+    "parentSha": "49c605ca85fa35b7c1b6819219cb7bd5209b4085",
+    "path": "source/as-promise/index.ts",
+    "message": "Fix `deflate` responses not being decompressed (#1918)",
+    "buggyLines": [
+      56,
+      57
+    ],
+    "fileLines": 206
+  },
+  {
+    "repo": "sindresorhus/got",
+    "fixSha": "0a302f0163ee48809885bad92ff2b62adc77398c",
+    "parentSha": "9abdd06d72d90d034299dabd22544d14c897643b",
+    "path": "benchmark/index.ts",
+    "message": "Fix linting",
+    "buggyLines": [
+      24,
+      25
+    ],
+    "fileLines": 217
+  },
+  {
+    "repo": "psf/requests",
+    "fixSha": "22db55a8896b69e53d0a3cc2764c27b832c81478",
+    "parentSha": "6e5b15d542a4e85945fd72066bb6cecbc3a82191",
+    "path": "requests/api.py",
+    "message": "Fix doc typo (#6467)",
+    "buggyLines": [
+      28,
+      29
+    ],
+    "fileLines": 158
+  },
+  {
+    "repo": "psf/requests",
+    "fixSha": "16a17a3ca7134b0a56c49653165ef37cb6acfece",
+    "parentSha": "61c324da43dd8b775d3930d76265538b3ca27bc1",
+    "path": "setup.py",
+    "message": "fix: Remove '<4' from python_requires (#6333)",
+    "buggyLines": [
+      97,
+      98
+    ],
+    "fileLines": 133
+  },
+  {
+    "repo": "pallets/flask",
+    "fixSha": "eb1182a10e757b5e76009c69fdf3a88a5afc6840",
+    "parentSha": "a363642a32880114c7944b1017f2f69bd4cc00eb",
+    "path": "src/flask/sessions.py",
+    "message": "fix mypy finding",
+    "buggyLines": [
+      368,
+      369,
+      371,
+      372
+    ],
+    "fileLines": 380
+  },
+  {
+    "repo": "pallets/flask",
+    "fixSha": "a363642a32880114c7944b1017f2f69bd4cc00eb",
+    "parentSha": "f958b6500b2aeb8edc578a07f00546becdad4c80",
+    "path": "src/flask/wrappers.py",
+    "message": "fix mypy finding with new werkzeug endpoint type",
+    "buggyLines": [
+      74,
+      75
+    ],
+    "fileLines": 175
+  },
+  {
+    "repo": "pallets/flask",
+    "fixSha": "ccf125bf30102beedafb3ecef72376bfb6c90a4d",
+    "parentSha": "db0fe9436e9da7f7bd14683542bbf33ba3c6d5e4",
+    "path": "src/flask/sessions.py",
+    "message": "fix mypy findings",
+    "buggyLines": [
+      371,
+      372
+    ],
+    "fileLines": 380
+  },
+  {
+    "repo": "tj/commander.js",
+    "fixSha": "3798334009a80c8cfd207b1e9373b0f1df6ba58a",
+    "parentSha": "4a7148a89776298fbe6876f57ad1cf355d8af974",
+    "path": ".eslintrc.js",
+    "message": "Fix override for semi after base changed (#1270)",
+    "buggyLines": [
+      12,
+      13,
+      27,
+      28
+    ],
+    "fileLines": 51
+  },
+  {
+    "repo": "chalk/chalk",
+    "fixSha": "4ebb62d1ca70c122674558a88932ddf6545fe9ef",
+    "parentSha": "fc809b686d5048d56fec3a5d96d1ad57dee193bf",
+    "path": "source/vendor/supports-color/browser.js",
+    "message": "Fix `navigator` not defined `ReferenceError` (#642)",
+    "buggyLines": [
+      4,
+      5,
+      11,
+      12
+    ],
+    "fileLines": 31
+  },
+  {
+    "repo": "chalk/chalk",
+    "fixSha": "a34bcf63273cd94da041b9507ce57f0f3fd1e89e",
+    "parentSha": "1b4cd21fb15ca441ab8ff1fc4ce9fcd1365e4b7d",
+    "path": "source/vendor/ansi-styles/index.js",
+    "message": "Fix exported styles names (#569)",
+    "buggyLines": [
+      68,
+      219,
+      220,
+      221,
+      222,
+      223
+    ],
+    "fileLines": 224
+  },
+  {
+    "repo": "chalk/chalk",
+    "fixSha": "d939a3f9bc70b9f6d265934047e4a191078180b4",
+    "parentSha": "a125eb0e726f51a3ad6499831f6edcabcc5411db",
+    "path": "index.js",
+    "message": "fix XO lint issue",
+    "buggyLines": [
+      5
+    ],
+    "fileLines": 100
+  },
+  {
+    "repo": "uuidjs/uuid",
+    "fixSha": "e267b9073df1d0ce119ee53c0487fe76acb2be37",
+    "parentSha": "ca1d39d58a6308d5311bcb356a931aa818ec0ded",
+    "path": "src/stringify.js",
+    "message": "fix: revert \"perf: remove superfluous call to toLowerCase (#677)\" (#738)",
+    "buggyLines": [
+      16,
+      37,
+      38
+    ],
+    "fileLines": 55
+  },
+  {
+    "repo": "uuidjs/uuid",
+    "fixSha": "c57bc5a9a0653273aa639cda9177ce52efabe42a",
+    "parentSha": "ed3240154759b748f6a3b7d545f3b10759ee4ba7",
+    "path": "src/v35.js",
+    "message": "fix: change default export to named function (#545)",
+    "buggyLines": [
+      19,
+      20
+    ],
+    "fileLines": 69
+  },
+  {
+    "repo": "uuidjs/uuid",
+    "fixSha": "8bf2a20f3565df743da7215eebdbada9d2df118c",
+    "parentSha": "bb2c8e4e9f4c5f9c1eaaf3ea59710c633cd90cb7",
+    "path": "src/rng-browser.js",
+    "message": "fix: make access to msCrypto consistent (#393)",
+    "buggyLines": [
+      10,
+      11
+    ],
+    "fileLines": 22
+  },
+  {
+    "repo": "uuidjs/uuid",
+    "fixSha": "305d87779000d9b0e40ab4d481eb3b79c5965607",
+    "parentSha": "e134f0dcbde976d5f69d3db143bee8e2fa8a9f2c",
+    "path": "lib/v35.js",
+    "message": "fix: typo",
+    "buggyLines": [
+      6
+    ],
+    "fileLines": 59
+  }
+]
