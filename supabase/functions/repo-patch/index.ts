@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import type { IngestResult } from "../_shared/ingest.ts";
-import { TtlCache, clientIp, rateLimited } from "../_shared/limits.ts";
+import { TtlCache, clientIp, overLimit } from "../_shared/limits.ts";
 import { applyEdit } from "../_shared/patch.ts";
 import { loadSource, MAX_INLINE_CHARS } from "../_shared/source.ts";
 import { corsHeadersFor } from "../_shared/validate.ts";
@@ -16,7 +16,7 @@ serve(async (req) => {
     new Response(JSON.stringify(b), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
-  if (rateLimited(clientIp(req))) return json({ error: "Too many requests. Please wait a minute." }, 429);
+  if (await overLimit(clientIp(req), { url: Deno.env.get("SUPABASE_URL"), key: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") }, fetch, 20, 60, (m) => console.error(m))) return json({ error: "Too many requests. Please wait a minute." }, 429);
 
   try {
     const raw = await req.text();

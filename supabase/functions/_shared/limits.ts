@@ -30,3 +30,31 @@ export class TtlCache<T> {
     this.m.set(k, { v, exp: now + this.ttlMs });
   }
 }
+
+export type GlobalCfg = { url?: string; key?: string };
+export type Fetcher = (url: string, init: { method: string; headers: Record<string, string>; body: string; signal?: AbortSignal }) => Promise<Response>;
+
+/**
+ * True when `ip` should be rejected. Layer 1: per-isolate counter (free, instant). Layer 2: shared Postgres counter
+ * (rl_hit RPC via the service role) so limits hold across isolates. If the DB is unreachable or unconfigured we fail
+ * OPEN to layer 1 only (availability over strictness) and `onError` is called so it can be logged.
+ */
+export async function overLimit(
+  ip: string, cfg: GlobalCfg, doFetch: Fetcher = fetch, max = 20, windowSec = 60, onError: (m: string) => void = () => {},
+): Promise<boolean> {
+  if (rateLimited(ip, max, windowSec * 1000)) return true;
+  if (!cfg.url || !cfg.key) return false;
+  try {
+    const r = await doFetch(`${cfg.url}/rest/v1/rpc/rl_hit`, {
+      method: 'POST',
+      headers: { apikey: cfg.key, Authorization: `Bearer ${cfg.key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_key: ip, p_window_sec: windowSec, p_max: max }),
+      signal: AbortSignal.timeout(1500),
+    });
+    if (!r.ok) { onError(`rl_hit http ${r.status}`); return false; }
+    return (await r.json()) === true;
+  } catch {
+    onError('rl_hit unreachable');
+    return false;
+  }
+}
