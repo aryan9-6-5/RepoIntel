@@ -17,3 +17,6 @@ verify_jwt = true
 
 [functions.repo-patch]
 verify_jwt = true
+
+[functions.repo-overview]
+verify_jwt = true

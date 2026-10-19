@@ -5,6 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { parseRepoRef } from '../../supabase/functions/_shared/repoUrl';
+import type { Dependencies, Overview, TreeNode } from '../../supabase/functions/_shared/overview';
+import { CodeViewer } from '@/components/CodeViewer';
+import { FileTree } from '@/components/FileTree';
+
+interface Explorer {
+  overview: Overview;
+  dependencies: Dependencies[];
+  tree: TreeNode[];
+  summary?: string;
+  summaryError?: string;
+  citations?: { valid: string[]; invalid: string[]; grounded: boolean };
+}
 
 interface IngestFile {
   path: string;
@@ -96,6 +108,22 @@ export default function RepoImport() {
     }
   };
 
+  const [explorer, setExplorer] = useState<Explorer | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [hl, setHl] = useState<[number, number] | null>(null);
+
+  const openRef = (ref: string) => {
+    const m = ref.match(/^(.+):(\d+)-(\d+)$/);
+    if (!m) return;
+    setSelected(m[1]);
+    setHl([+m[2], +m[3]]);
+  };
+
+  const loadOverview = async (withSummary: boolean) => {
+    const r = await call<Explorer>('repo-overview', { repo: input, summary: withSummary }, 'overview');
+    if (r) setExplorer(r);
+  };
+
   const analyze = async (path: string) => {
     setProposal(null);
     setAnalysis(null);
@@ -122,6 +150,10 @@ export default function RepoImport() {
       const { data, error: fnError } = await supabase.functions.invoke('repo-ingest', { body: { repo: input } });
       if (fnError) throw fnError;
       setResult(data as IngestSuccess);
+      setExplorer(null);
+      setSelected(null);
+      setHl(null);
+      void loadOverview(false);
     } catch (err) {
       setError(await readFunctionError(err));
     } finally {
@@ -182,6 +214,11 @@ export default function RepoImport() {
                 {answer.citations.invalid.length > 0 && ` Invalid (ignored): ${answer.citations.invalid.join(', ')}`}
                 {' '}Commit {answer.commitSha.slice(0, 7)}.
               </p>
+              <div className="flex flex-wrap gap-2">
+                {answer.citations.valid.map((c) => (
+                  <Button key={c} size="sm" variant="outline" onClick={() => openRef(c)}>{c}</Button>
+                ))}
+              </div>
               {answer.snippets.map((s) => (
                 <details key={s.path + s.start}>
                   <summary className="cursor-pointer text-primary">{s.path}:{s.start}-{s.end}</summary>
@@ -193,11 +230,16 @@ export default function RepoImport() {
           {analysis && (
             <div className="space-y-3 rounded-lg border border-border bg-card p-4 text-sm">
               <p className="font-semibold text-foreground">Findings: {analysis.path} @ {analysis.commitSha.slice(0, 7)}</p>
-              {analysis.findings.length === 0 && <p className="text-muted-foreground">No findings. This is not proof the file is bug-free.</p>}
+              {analysis.llmStatus !== 'ok' && (
+                <p role="status" className="text-xs text-amber-500">
+                  {analysis.llmStatus === 'error_429' ? 'AI analysis was rate limited by the free tier; only pattern checks ran. Try again in a minute.' : `AI analysis did not run (${analysis.llmStatus}); only pattern checks ran.`}
+                </p>
+              )}
+              {analysis.findings.length === 0 && <p className="text-muted-foreground">No findings{analysis.llmStatus === 'ok' ? '' : ' from the checks that ran'}. This is not proof the file is bug-free.</p>}
               {analysis.findings.map((f) => (
                 <div key={f.rule + f.line + f.title} className="rounded border border-border p-2">
                   <p className="text-foreground">
-                    line {f.line}: {f.title} <span className="text-xs text-muted-foreground">[{f.severity}, {f.kind === 'static' ? 'pattern match' : 'unverified model hypothesis'}, confidence {f.confidence}]</span>
+                    <button type="button" className="text-primary underline" onClick={() => { setSelected(analysis.path); setHl([f.line, f.line]); }}>line {f.line}</button>: {f.title} <span className="text-xs text-muted-foreground">[{f.severity}, {f.kind === 'static' ? 'pattern match' : 'unverified model hypothesis'}, confidence {f.confidence}]</span>
                   </p>
                   <pre className="my-1 overflow-auto rounded bg-secondary/50 p-1 text-xs">{f.evidence}</pre>
                   <p className="text-xs text-muted-foreground">{f.rationale}</p>
@@ -221,18 +263,77 @@ export default function RepoImport() {
               </Button>
             </div>
           )}
-          <ul className="max-h-[28rem] divide-y divide-border overflow-y-auto rounded-lg border border-border bg-card">
-            {result.files.map((f) => (
-              <li key={f.sha + f.path} className="flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground">
-                <FileCode2 className="h-4 w-4 shrink-0 text-primary" />
-                <span className="truncate text-foreground">{f.path}</span>
-                <span className="ml-auto shrink-0 text-xs">{f.size ?? 0} B</span>
-                <Button size="sm" variant="outline" disabled={!!busy} onClick={() => analyze(f.path)}>
-                  {busy === f.path ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Analyze'}
-                </Button>
-              </li>
-            ))}
-          </ul>
+          {explorer && (
+            <div className="space-y-3 rounded-lg border border-border bg-card p-4 text-sm">
+              <p className="font-semibold text-foreground">Overview (derived from the file list and manifests)</p>
+              <p className="text-muted-foreground">
+                {explorer.overview.fileCount} files - {explorer.overview.languages.slice(0, 4).map((l) => `${l.name} ${l.files}`).join(', ') || 'no known languages'}
+              </p>
+              <p className="text-muted-foreground">
+                Entry points:{' '}
+                {explorer.overview.entryPoints.length === 0 ? 'none detected' : explorer.overview.entryPoints.map((p) => (
+                  <button key={p} type="button" className="mr-2 text-primary underline" onClick={() => { setSelected(p); setHl(null); }}>{p}</button>
+                ))}
+              </p>
+              {explorer.dependencies.map((d) => (
+                <details key={d.source}>
+                  <summary className="cursor-pointer text-foreground">{d.source}: {d.runtime.length} runtime, {d.dev.length} dev dependencies</summary>
+                  <p className="mt-1 text-xs text-muted-foreground">{d.runtime.join(', ')}</p>
+                </details>
+              ))}
+              {explorer.summary ? (
+                <div className="space-y-1">
+                  <p className="whitespace-pre-wrap text-foreground">{explorer.summary}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {explorer.citations?.valid.map((c) => (
+                      <Button key={c} size="sm" variant="outline" onClick={() => openRef(c)}>{c}</Button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {explorer.citations?.grounded ? 'Citations verified against the files read.' : 'No verified citations: treat as unsupported.'}
+                    {explorer.citations && explorer.citations.invalid.length > 0 && ` Invalid (ignored): ${explorer.citations.invalid.join(', ')}`}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {explorer.summaryError && <p role="alert" className="text-xs text-destructive">{explorer.summaryError}</p>}
+                  <Button size="sm" variant="outline" disabled={!!busy} onClick={() => loadOverview(true)}>
+                    {busy === 'overview' ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Generate architecture summary'}
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
+          {!explorer && busy === 'overview' && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-label="Loading overview" />}
+          <div className="grid gap-3 md:grid-cols-[16rem_1fr]">
+            <nav aria-label="Files" className="max-h-[32rem] overflow-auto rounded-lg border border-border bg-card p-2">
+              {explorer ? (
+                <FileTree nodes={explorer.tree} selected={selected} onSelect={(p) => { setSelected(p); setHl(null); }} />
+              ) : (
+                <ul className="text-sm text-muted-foreground">
+                  {result.files.map((f) => (
+                    <li key={f.sha + f.path}><button type="button" onClick={() => { setSelected(f.path); setHl(null); }} className="hover:text-primary">{f.path}</button></li>
+                  ))}
+                </ul>
+              )}
+            </nav>
+            <div className="min-w-0 space-y-2">
+              {selected ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <FileCode2 className="h-4 w-4 text-primary" />
+                    <span className="truncate text-sm text-foreground">{selected}</span>
+                    <Button size="sm" variant="outline" className="ml-auto" disabled={!!busy} onClick={() => analyze(selected)}>
+                      {busy === selected ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Analyze'}
+                    </Button>
+                  </div>
+                  <CodeViewer repoId={result.repoId} commitSha={result.commitSha} path={selected} highlight={hl} />
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground">Select a file to view its source with line numbers.</p>
+              )}
+            </div>
+          </div>
         </section>
       )}
     </main>
