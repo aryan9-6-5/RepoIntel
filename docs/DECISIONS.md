@@ -33,3 +33,6 @@ pure modules importable by both. Live GitHub/Groq calls only in documented manua
 
 ## ADR-007 - Stateless retrieval instead of a stored index (2026-10-19) - PROVISIONAL
 Per-query: tree -> path ranking -> raw fetch at pinned commit -> chunk -> keyword score. No DB, no staleness, no corruption risk; costs a few GitHub calls per query. Revisit if Phase 6 metrics show quota/latency problems.
+
+## ADR-008 - Groq model gpt-oss-120b (2026-10-19) - PROVISIONAL
+llama-3.3-70b-versatile returned 404 model_not_found for the project's key; available: gpt-oss-120b/20b, qwen3.8-27b, allam-2-7b. Chose openai/gpt-oss-120b; `reasoning_effort: "low"` + larger max_tokens needed so JSON output isn't starved by reasoning tokens. Model id is repeated in each function (single constant is a later cleanup).

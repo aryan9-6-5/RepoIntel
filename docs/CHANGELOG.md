@@ -12,3 +12,10 @@
 - Dependencies: added dev dependency `vitest`; added `npm test`.
 - Bug fixes/cleanup: removed `any` usage in RepoDetailModal and the edge function (lint 10 -> 5 errors).
 - Breaking: after deploy, callers without the Supabase publishable key are rejected; browsers must come from `ALLOWED_ORIGINS`.
+
+## 2026-10-19 - Phases 2-7 (working baseline)
+- New functions: repo-query (retrieval + grounded Q&A with verified citations), repo-analyze (static rules + hypotheses), repo-patch (validated edit + diff). Model switched to openai/gpt-oss-120b.
+- UI: `/import` shows files, Q&A, findings, proposed diff and the local verify command (no auto-apply).
+- Local tooling: scripts/verify-patch.mjs (Docker sandbox), scripts/eval.mjs (benchmark -> docs/EVAL.md).
+- Security/cost: per-isolate rate limit on all repo-* functions, 5-min tree cache, CORS allowlist, .env.example, .env and supabase/.temp untracked.
+- Cleanup: lint 0 errors; non-breaking npm audit fixes; vitest 3; README rewritten.
