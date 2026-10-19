@@ -19,3 +19,10 @@
 - Local tooling: scripts/verify-patch.mjs (Docker sandbox), scripts/eval.mjs (benchmark -> docs/EVAL.md).
 - Security/cost: per-isolate rate limit on all repo-* functions, 5-min tree cache, CORS allowlist, .env.example, .env and supabase/.temp untracked.
 - Cleanup: lint 0 errors; non-breaking npm audit fixes; vitest 3; README rewritten.
+
+## 2026-10-19 - Explorer, evaluation, security review
+- Added repo-overview (languages, entry points, dependencies, grounded architecture summary), file tree and line-numbered source viewer with clickable citations.
+- Q&A prompt now includes line numbers (fixed wrong citation lines); analyze discloses AI failures; JSON-object output + medium reasoning for findings.
+- Retrieval: prefix matching, tests/changelogs deprioritized, sublinear scoring (benchmark 10/12 -> 12/12, tuned on the benchmark).
+- Inline `content` mode for repo-analyze/repo-patch; `verify-patch.mjs --local`; eval/fixtures + scripts/eval-bugs.mjs; multi-repo scripts/eval.mjs; docs/EVAL-BUGS.md, docs/SECURITY.md.
+- Dependencies: Vite 6, Vitest 4, @swc/core pinned 1.13.5; audit 16 -> 11.
