@@ -173,25 +173,29 @@ export default function Index() {
   return (
     <main className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative py-16 md:py-24 overflow-hidden">
+      <section className={`relative overflow-hidden ${analyzeRepo ? 'py-6' : 'py-16 md:py-24'}`}>
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl opacity-20" />
         
         <div className="container relative z-10 px-4 mx-auto">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-6 animate-pulse-glow">
-              <Github className="w-8 h-8 text-primary" />
+          {analyzeRepo ? (
+            <h1 className="sr-only">GitHub Repo Explorer</h1>
+          ) : (
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-6 animate-pulse-glow">
+                <Github className="w-8 h-8 text-primary" />
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+                <span className="text-gradient">GitHub</span> Repo Explorer
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Discover and explore public repositories from any GitHub profile,
+                or paste owner/repo to analyze its source code.
+              </p>
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-              <span className="text-gradient">GitHub</span> Repo Explorer
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Discover and explore public repositories from any GitHub profile, 
-              or paste owner/repo to analyze its source code.
-            </p>
-          </div>
+          )}
 
-          <ProfileInput onSubmit={handleSearch} loading={loading} />
+          <ProfileInput onSubmit={handleSearch} loading={loading} compact={!!analyzeRepo} />
         </div>
       </section>
 

@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 interface ProfileInputProps {
   onSubmit: (input: string) => void;
   loading?: boolean;
+  /** hide the example links (used while a repository analysis is open) */
+  compact?: boolean;
 }
 
-export function ProfileInput({ onSubmit, loading }: ProfileInputProps) {
+export function ProfileInput({ onSubmit, loading, compact }: ProfileInputProps) {
   const [input, setInput] = useState('');
 
   const handleSubmit = (e: FormEvent) => {
@@ -25,7 +27,7 @@ export function ProfileInput({ onSubmit, loading }: ProfileInputProps) {
           <Github className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="GitHub username, or owner/repo to analyze its code..."
+            placeholder="Username or owner/repo"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="pl-12 pr-4 h-14 text-base bg-card/60 border-border/60"
@@ -46,11 +48,11 @@ export function ProfileInput({ onSubmit, loading }: ProfileInputProps) {
           <span className="hidden sm:inline ml-2">Fetch Repos</span>
         </Button>
       </div>
-      <p className="text-sm text-muted-foreground mt-3 text-center">
+      {!compact && <p className="text-sm text-muted-foreground mt-3 text-center">
         Try: <button type="button" onClick={() => setInput('torvalds')} className="text-primary hover:underline">torvalds</button>,{' '}
         <button type="button" onClick={() => setInput('https://github.com/facebook')} className="text-primary hover:underline">facebook</button>, or{' '}
         <button type="button" onClick={() => setInput('vercel')} className="text-primary hover:underline">vercel</button>
-      </p>
+      </p>}
     </form>
   );
 }
