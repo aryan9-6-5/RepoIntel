@@ -41,3 +41,6 @@ Status words: PASS = criterion met and verified with evidence; PARTIAL = built b
 
 ## Not claimed
 No claim of 100% completion. Real-bug finding and patching are not reliable yet; results above are small samples on popular public repos (possible training contamination).
+
+## Update 2026-10-21 (Q&A cap + citation retry, deployed)
+HELD-OUT live Q&A, 3 runs: before cap 6/7 grounded, capped 4/7 and 5/7, capped + one citation retry 7/7 (100%), 6/7 cite the right place, mean 3,322 tokens per answer (max 5,533) against an 8,000-per-minute free budget. Small samples; see docs/PROGRESS.md for the table. Unit tests 69/69.

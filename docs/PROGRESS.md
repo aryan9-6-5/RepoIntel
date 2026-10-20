@@ -143,3 +143,13 @@ HELD-OUT live Q&A after deploy (docs/EVAL-UNSEEN-HELDOUT.md): retrieval 11/14 (7
 ## Frontend deployed (2026-10-21)
 https://repointel-rho.vercel.app (Vercel project repointel). Live browser verification on the production URL: import jshttp/cookie (21 files), viewer 532 lines, grounded Q&A answer (2.9 s) with verified citations, profile explorer (29 repos, avatars load), 0 CSP violations. ALLOWED_ORIGINS updated in Supabase (live origin allowed, https://evil.example rejected).
 NEW RISK found on the live run: that one Q&A answer consumed 7,648 tokens (prompt + completion), i.e. almost the whole free 8,000 tokens/min budget of gpt-oss-120b. Several visitors asking within the same minute will hit 429 and fall back to the 20b model or see "try again in N seconds". Mitigation not yet done: cap snippet text sent to the model (fewer or shorter chunks) and/or lower max output; needs a code change + redeploy. The Vercel CLI also wrote .vercel/ (ignored) and briefly a .env.local with a short-lived Vercel token (deleted; never committed).
+
+## Q&A token cap and citation retry (2026-10-21), HELD-OUT live runs (14 queries, 4 unseen repos; Q&A only when retrieval hit, 7 answers per run)
+| Version | Answers with verified citation | Cites within +-30 lines of the definition | Invalid citations caught | Tokens/answer |
+|---------|-------------------------------|-------------------------------------------|--------------------------|---------------|
+| Before cap (docs/EVAL-UNSEEN-HELDOUT.md) | 6/7 (86%) | 5/7 (71%) | 0 | not recorded; spot check 7,648 on one query |
+| Cap only, run 1 (docs/EVAL-UNSEEN-HELDOUT-CAPPED.md) | 4/7 (57%) | 4/7 (57%) | 0 | mean 2,886, max 3,671 |
+| Cap only, run 2 (docs/EVAL-UNSEEN-HELDOUT-CAPPED-RUN2.md) | 5/7 (71%) | 4/7 (57%) | 2 | mean 2,916, max 3,577 |
+| Cap + one retry when nothing is cited (docs/EVAL-UNSEEN-HELDOUT-RETRY.md, DEPLOYED) | 7/7 (100%) | 6/7 (86%) | 1 | mean 3,322, max 5,533 |
+Reading: capping the prompt (~10k chars of snippets, 900-token output) cut tokens ~60% but lowered grounding in both capped runs; re-asking once when an answer has no verified citation restored it (retry rows cost extra tokens only on those answers, max 5.5k, still under the 8k/min budget). n=7 per run and one run per version, so differences of one answer are noise; the direction is consistent but not statistically proven. Retrieval is unchanged at 11/14 (79%). The same query that used 7,648 tokens now uses 3,235.
+Code: `fitSnippets` and `answerWithCitations` in `_shared/answer.ts` (7 new tests, 69 total), wired into `repo-query` (deployed). Known gap: AI analysis of a ~400-line file can still use most of the 8k/min budget (not capped).

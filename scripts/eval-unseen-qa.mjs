@@ -35,6 +35,7 @@ async function call(body) {
 }
 
 const per = {};
+const tokens = []; // prompt+completion tokens per answered question (free tier allows 8000/min)
 const rows = [];
 const qaSeen = {};
 let qaHeadMoved = 0;
@@ -59,6 +60,7 @@ for (const q of queries) {
     else {
       const c = a.d.citations;
       k.qaInvalid += c.invalid.length;
+      if (a.d.usage) tokens.push(a.d.usage.prompt + a.d.usage.completion);
       if (c.grounded) k.qaGrounded++;
       const near = c.valid.some((v) => { const m = v.match(/^(.+):(\d+)-(\d+)$/); return m && m[1] === q.path && +m[3] >= q.defLine - 30 && +m[2] <= q.defLine + 30; });
       if (near) k.qaCorrect++;
@@ -84,6 +86,7 @@ ${rows.join('\n')}
 - Q&A answers with >=1 verified citation (given retrieval hit): ${pct(T.qaGrounded, T.qa)}
 - Q&A answers whose citation lands within +-30 lines of the true definition: ${pct(T.qaCorrect, T.qa)}
 - Invalid (hallucinated) citations caught by verification: ${T.qaInvalid}; Q&A API failures: ${T.qaFail}
+- Tokens per answered question (prompt + completion): ${tokens.length ? `mean ${Math.round(tokens.reduce((a, b) => a + b, 0) / tokens.length)}, max ${Math.max(...tokens)}, n=${tokens.length}` : 'n/a'} (free-tier budget: 8000 tokens per minute)
 - Queries run where live HEAD differs from the dataset commit: ${qaHeadMoved}
 
 | Repo | File hit | Line hit | Grounded | Cites right place | Invalid cites |

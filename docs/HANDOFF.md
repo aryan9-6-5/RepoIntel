@@ -38,3 +38,6 @@ Updated: 2026-10-21 (release deployed and verified; commits local, not pushed).
 
 ## Update 2026-10-21 (later): frontend is LIVE
 https://repointel-rho.vercel.app (Vercel project repointel, account aryan9-6-5). See docs/DEPLOY.md "Live deployment". Remaining owner items: real screen-reader test, DB index decision. Recommended next engineering: cap Q&A prompt size (a single answer can use ~7.6k of the 8k tokens/min free budget).
+
+## Update 2026-10-21 (final)
+repo-query now (a) sends at most ~10k chars of snippets and 900 output tokens, (b) retries once when an answer has no verified citation. Deployed and measured on held-out data (7/7 grounded, mean 3.3k tokens). All of this is committed and pushed to origin/main (your own vite.config.ts and hello.txt remain local-only). Remaining owner items: real screen-reader test, DB full-text index decision. Open engineering: cap analyze prompt size for ~400-line files; stronger real-bug accuracy.
