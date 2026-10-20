@@ -14,7 +14,11 @@ const env = Object.fromEntries(
     .map((l) => { const i = l.indexOf('='); return [l.slice(0, i), l.slice(i + 1).replace(/^"|"$/g, '')]; }),
 );
 const QA_PER_REPO = Number(process.argv[2] ?? 4);
-const queries = JSON.parse(readFileSync(join(root, 'eval/unseen/queries.json'), 'utf8'));
+const DATASET = process.argv[3] ?? 'eval/unseen/queries.json';
+const REPORT = process.argv[4] ?? 'docs/EVAL-UNSEEN.md';
+// Free-tier Groq allows 8000 tokens/min and one Q&A call uses ~3.9k, so pace Q&A calls (override with EVAL_QA_PACE_MS)
+const QA_PACE = Number(process.env.EVAL_QA_PACE_MS ?? 35_000);
+const queries = JSON.parse(readFileSync(join(root, DATASET), 'utf8'));
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function call(body) {
@@ -49,7 +53,7 @@ for (const q of queries) {
   if (hit && qaSeen[q.repo] < QA_PER_REPO) {
     qaSeen[q.repo]++;
     const a = await call({ repo: q.repo, query: q.kind === 'doc' ? `${q.query}` : q.query, ask: true });
-    await sleep(6000);
+    await sleep(QA_PACE);
     k.qa++;
     if (a.status !== 200 || !a.d.citations) { k.qaFail++; qa = `API fail (http ${a.status})`; }
     else {
@@ -89,5 +93,5 @@ ${byRepo}
 ## Limits
 Small samples per repo; queries are proxies (a doc comment is not how real users ask questions); "cites the right place" checks location, not whether the prose is correct; popular repos may be in the model's training data; Groq free tier can 429 (retried, failures counted).
 `;
-writeFileSync(join(root, 'docs/EVAL-UNSEEN.md'), md);
+writeFileSync(join(root, REPORT), md);
 console.log(md);
