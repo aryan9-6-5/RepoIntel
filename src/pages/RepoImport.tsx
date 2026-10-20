@@ -25,6 +25,9 @@ interface IngestFile {
 }
 
 interface Answer {
+  usage?: { prompt: number; completion: number };
+  ms?: number;
+  cached?: boolean;
   answer: string;
   commitSha: string;
   snippets: { path: string; start: number; end: number; text: string }[];
@@ -33,7 +36,7 @@ interface Answer {
 
 interface FindingT {
   rule: string; title: string; line: number; severity: string; kind: 'static' | 'hypothesis';
-  confidence: string; evidence: string; rationale: string;
+  confidence: string; evidence: string; rationale: string; reproduction?: string;
 }
 
 interface Proposal { path: string; commitSha: string; diff: string; edit: { startLine: number; endLine: number; newText: string } }
@@ -46,6 +49,24 @@ interface IngestSuccess {
   files: IngestFile[];
   skipped: { excluded: number; oversize: number };
   totalBytes: number;
+}
+
+/** Renders model text; lines the model marks "Inference:" are visibly separated from claims that cite code. */
+function AnswerText({ text }: { text: string }) {
+  return (
+    <div className="space-y-1 text-foreground">
+      {text.split('\n').map((line, i) =>
+        /^\s*(\*\*)?Inference:/i.test(line) ? (
+          <p key={i} className="whitespace-pre-wrap rounded border border-amber-500/40 bg-amber-500/10 p-1.5">
+            <span className="mr-1 rounded bg-amber-500/20 px-1 text-xs font-medium text-amber-500">Inference, not shown in the code</span>
+            {line.replace(/^\s*(\*\*)?Inference:(\*\*)?\s*/i, '')}
+          </p>
+        ) : (
+          <p key={i} className="whitespace-pre-wrap">{line}</p>
+        ),
+      )}
+    </div>
+  );
 }
 
 async function readFunctionError(error: unknown): Promise<string> {
@@ -185,7 +206,7 @@ export default function RepoImport() {
       </form>
 
       {error && (
-        <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+        <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-red-400">
           {error}
         </p>
       )}
@@ -208,11 +229,15 @@ export default function RepoImport() {
           </form>
           {answer && (
             <div className="space-y-3 rounded-lg border border-border bg-card p-4 text-sm">
-              <p className="whitespace-pre-wrap text-foreground">{answer.answer}</p>
+              <AnswerText text={answer.answer} />
+              {result && answer.commitSha !== result.commitSha && (
+                <p role="status" className="text-xs text-amber-500">The repository changed since you imported it: this answer uses the newer commit {answer.commitSha.slice(0, 7)} (imported {result.commitSha.slice(0, 7)}). Re-import to refresh the file list.</p>
+              )}
               <p className="text-xs text-muted-foreground">
                 {answer.citations.grounded ? `Verified citations: ${answer.citations.valid.join(', ')}` : 'No verified citations: treat as unsupported.'}
                 {answer.citations.invalid.length > 0 && ` Invalid (ignored): ${answer.citations.invalid.join(', ')}`}
                 {' '}Commit {answer.commitSha.slice(0, 7)}.
+                {' '}{answer.cached ? 'Cached answer. ' : ''}{answer.ms != null ? `${answer.ms} ms` : ''}{answer.usage ? `, ${answer.usage.prompt + answer.usage.completion} tokens` : ''}
               </p>
               <div className="flex flex-wrap gap-2">
                 {answer.citations.valid.map((c) => (
@@ -222,7 +247,7 @@ export default function RepoImport() {
               {answer.snippets.map((s) => (
                 <details key={s.path + s.start}>
                   <summary className="cursor-pointer text-primary">{s.path}:{s.start}-{s.end}</summary>
-                  <pre className="mt-1 max-h-64 overflow-auto rounded bg-secondary/50 p-2 text-xs">{s.text}</pre>
+                  <pre tabIndex={0} className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary mt-1 max-h-64 overflow-auto rounded bg-secondary/50 p-2 text-xs">{s.text}</pre>
                 </details>
               ))}
             </div>
@@ -241,8 +266,11 @@ export default function RepoImport() {
                   <p className="text-foreground">
                     <button type="button" className="inline-block min-h-[28px] text-primary underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary" onClick={() => { setSelected(analysis.path); setHl([f.line, f.line]); }}>line {f.line}</button>: {f.title} <span className="text-xs text-muted-foreground">[{f.severity}, {f.kind === 'static' ? 'pattern match' : 'unverified model hypothesis'}, confidence {f.confidence}]</span>
                   </p>
-                  <pre className="my-1 overflow-auto rounded bg-secondary/50 p-1 text-xs">{f.evidence}</pre>
+                  <pre tabIndex={0} className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary my-1 overflow-auto rounded bg-secondary/50 p-1 text-xs">{f.evidence}</pre>
                   <p className="text-xs text-muted-foreground">{f.rationale}</p>
+                  {f.reproduction && (
+                    <p className="text-xs text-muted-foreground"><span className="font-medium text-foreground">How to check: </span>{f.reproduction}</p>
+                  )}
                   <Button size="sm" variant="outline" className="mt-1" disabled={!!busy} onClick={() => propose(f)}>
                     {busy === `fix-${f.line}` ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Propose fix'}
                   </Button>
@@ -253,11 +281,11 @@ export default function RepoImport() {
           {proposal && (
             <div className="space-y-2 rounded-lg border border-primary/40 bg-card p-4 text-sm">
               <p className="font-semibold text-foreground">Proposed patch (unverified, nothing applied)</p>
-              <pre className="max-h-72 overflow-auto rounded bg-secondary/50 p-2 text-xs">{proposal.diff}</pre>
+              <pre tabIndex={0} className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary max-h-72 overflow-auto rounded bg-secondary/50 p-2 text-xs">{proposal.diff}</pre>
               <p className="text-xs text-muted-foreground">
                 To verify in an isolated local Docker sandbox, save this response as patch.json and run:
               </p>
-              <pre className="overflow-auto rounded bg-secondary/50 p-2 text-xs">{`node scripts/verify-patch.mjs ${result.repoId} ${proposal.commitSha} patch.json "npm test"`}</pre>
+              <pre tabIndex={0} className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary overflow-auto rounded bg-secondary/50 p-2 text-xs">{`node scripts/verify-patch.mjs ${result.repoId} ${proposal.commitSha} patch.json "npm test"`}</pre>
               <Button size="sm" variant="outline" onClick={() => navigator.clipboard?.writeText(JSON.stringify({ path: proposal.path, edit: proposal.edit }, null, 2))}>
                 Copy patch.json
               </Button>
@@ -296,7 +324,7 @@ export default function RepoImport() {
                 </div>
               ) : (
                 <>
-                  {explorer.summaryError && <p role="alert" className="text-xs text-destructive">{explorer.summaryError}</p>}
+                  {explorer.summaryError && <p role="alert" className="text-xs text-red-400">{explorer.summaryError}</p>}
                   <Button size="sm" variant="outline" disabled={!!busy} onClick={() => loadOverview(true)}>
                     {busy === 'overview' ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Generate architecture summary'}
                   </Button>
