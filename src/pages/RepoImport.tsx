@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { FileCode2, Loader2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { parseRepoRef } from '../../supabase/functions/_shared/repoUrl';
 import type { Dependencies, Overview, TreeNode } from '../../supabase/functions/_shared/overview';
 import { CodeViewer } from '@/components/CodeViewer';
 import { FileTree } from '@/components/FileTree';
+import { MarkdownContent } from '@/components/MarkdownContent';
 
 interface Explorer {
   overview: Overview;
@@ -51,24 +52,6 @@ interface IngestSuccess {
   totalBytes: number;
 }
 
-/** Renders model text; lines the model marks "Inference:" are visibly separated from claims that cite code. */
-function AnswerText({ text }: { text: string }) {
-  return (
-    <div className="space-y-1 text-foreground">
-      {text.split('\n').map((line, i) =>
-        /^\s*(\*\*)?Inference:/i.test(line) ? (
-          <p key={i} className="whitespace-pre-wrap rounded border border-amber-500/40 bg-amber-500/10 p-1.5">
-            <span className="mr-1 rounded bg-amber-500/20 px-1 text-xs font-medium text-amber-500">Inference, not shown in the code</span>
-            {line.replace(/^\s*(\*\*)?Inference:(\*\*)?\s*/i, '')}
-          </p>
-        ) : (
-          <p key={i} className="whitespace-pre-wrap">{line}</p>
-        ),
-      )}
-    </div>
-  );
-}
-
 async function readFunctionError(error: unknown): Promise<string> {
   const ctx = (error as { context?: Response })?.context;
   if (ctx && typeof ctx.json === 'function') {
@@ -83,7 +66,9 @@ async function readFunctionError(error: unknown): Promise<string> {
 }
 
 export default function RepoImport() {
-  const [input, setInput] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const repoParam = searchParams.get('repo') || '';
+  const [input, setInput] = useState(repoParam);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<IngestSuccess | null>(null);
@@ -140,8 +125,8 @@ export default function RepoImport() {
     setHl([+m[2], +m[3]]);
   };
 
-  const loadOverview = async (withSummary: boolean) => {
-    const r = await call<Explorer>('repo-overview', { repo: input, summary: withSummary }, 'overview');
+  const loadOverview = async (withSummary: boolean, repoTarget = input) => {
+    const r = await call<Explorer>('repo-overview', { repo: repoTarget, summary: withSummary }, 'overview');
     if (r) setExplorer(r);
   };
 
@@ -158,23 +143,23 @@ export default function RepoImport() {
     if (r) setProposal(r);
   };
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const runIngest = async (targetRepo: string) => {
     setError(null);
     setResult(null);
-    if (!parseRepoRef(input)) {
+    if (!parseRepoRef(targetRepo)) {
       setError('Enter a public GitHub repository as owner/repo or a github.com URL.');
       return;
     }
     setLoading(true);
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('repo-ingest', { body: { repo: input } });
+      const { data, error: fnError } = await supabase.functions.invoke('repo-ingest', { body: { repo: targetRepo } });
       if (fnError) throw fnError;
       setResult(data as IngestSuccess);
       setExplorer(null);
       setSelected(null);
       setHl(null);
-      void loadOverview(false);
+      setSearchParams({ repo: targetRepo });
+      void loadOverview(false, targetRepo);
     } catch (err) {
       setError(await readFunctionError(err));
     } finally {
@@ -182,13 +167,25 @@ export default function RepoImport() {
     }
   };
 
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    void runIngest(input);
+  };
+
+  // /import?repo=owner/repo analyzes that repo on load (once; runIngest then keeps the URL in sync)
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (repoParam && !autoStarted.current) {
+      autoStarted.current = true;
+      void runIngest(repoParam);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <main className="container mx-auto max-w-3xl px-4 py-10">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Import a repository</h1>
-        <Link to="/" className="inline-flex min-h-[40px] items-center text-sm text-primary hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary md:min-h-[28px]">
-          Profile explorer
-        </Link>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-foreground">Analyze a repository</h1>
       </div>
 
       <form onSubmit={submit} className="mb-6 flex gap-2">
@@ -229,7 +226,7 @@ export default function RepoImport() {
           </form>
           {answer && (
             <div className="space-y-3 rounded-lg border border-border bg-card p-4 text-sm">
-              <AnswerText text={answer.answer} />
+              <MarkdownContent content={answer.answer} />
               {result && answer.commitSha !== result.commitSha && (
                 <p role="status" className="text-xs text-amber-500">The repository changed since you imported it: this answer uses the newer commit {answer.commitSha.slice(0, 7)} (imported {result.commitSha.slice(0, 7)}). Re-import to refresh the file list.</p>
               )}
@@ -310,8 +307,8 @@ export default function RepoImport() {
                 </details>
               ))}
               {explorer.summary ? (
-                <div className="space-y-1">
-                  <p className="whitespace-pre-wrap text-foreground">{explorer.summary}</p>
+                <div className="space-y-3">
+                  <MarkdownContent content={explorer.summary} />
                   <div className="flex flex-wrap gap-2">
                     {explorer.citations?.valid.map((c) => (
                       <Button key={c} size="sm" variant="outline" onClick={() => openRef(c)}>{c}</Button>

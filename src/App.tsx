@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import NotFound from "./pages/NotFound";
 
+import { Navbar } from "@/components/Navbar";
+
 // Route-level code splitting: the profile explorer and RepoPilot load only when visited.
 const Index = lazy(() => import("./pages/Index"));
 const RepoImport = lazy(() => import("./pages/RepoImport"));
@@ -18,6 +20,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <Navbar />
         <Suspense fallback={<p role="status" className="p-6 text-sm text-muted-foreground">Loading...</p>}>
         <Routes>
           <Route path="/" element={<Index />} />

@@ -58,7 +58,9 @@ serve(async (req) => {
         return t ? chunkFile(p, t, 80).slice(0, 1) : [];
       }))).flat();
       const facts = `Languages: ${overview.languages.map((l) => `${l.name} (${l.files})`).join(", ")}\nTop directories: ${overview.topDirs.slice(0, 8).map((d) => `${d.name} (${d.files})`).join(", ")}\nEntry points: ${overview.entryPoints.join(", ") || "none detected"}`;
-      const msgs = buildMessages(`Summarize the architecture of this repository: purpose, main modules, and how the entry points connect. Detected facts (not from snippets):\n${facts}`, snippets);
+      const prompt = `Summarize this repository: what it is for, its main modules, and how the entry points connect. Use Markdown with short headings and cite code as [path:startLine-endLine]. Describe only what the snippets or the detected facts show; put anything you are inferring on its own line starting with "Inference:". Detected facts:
+${facts}`;
+      const msgs = buildMessages(prompt, snippets);
       const r = await groqChat(key, { messages: msgs, maxTokens: 2500, temperature: 0.2, reasoningEffort: "low" });
       if (r.ok) {
         result.summary = r.text;

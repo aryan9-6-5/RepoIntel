@@ -1,5 +1,6 @@
-import { GitHubRepository } from '@/types/github';
+import { Link } from 'react-router-dom';
 import { Star, GitFork, Eye, Calendar, Code2, ExternalLink } from 'lucide-react';
+import { GitHubRepository } from '@/types/github';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
@@ -54,17 +55,27 @@ export function RepoCard({ repo, onClick, index }: RepoCardProps) {
               )}
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(repo.html_url, '_blank');
-            }}
-          >
-            <ExternalLink className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Link
+              to={`/import?repo=${encodeURIComponent(repo.full_name)}`}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20"
+            >
+              Analyze
+            </Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(repo.html_url, '_blank');
+              }}
+              title="Open on GitHub"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </div>
 
         <p className="text-sm text-muted-foreground line-clamp-2 mb-4 flex-1">

@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Github } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ProfileInput } from '@/components/ProfileInput';
 import { UserProfile } from '@/components/UserProfile';
 import { RepoFilters } from '@/components/RepoFilters';
@@ -11,11 +11,13 @@ import { EmptyState } from '@/components/EmptyState';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton';
 import { useGitHubApi } from '@/hooks/useGitHubApi';
 import { GitHubRepository, GitHubUser, FilterState } from '@/types/github';
+import { parseRepoRef } from '../../supabase/functions/_shared/repoUrl';
 import { toast } from 'sonner';
 
 const REPOS_PER_PAGE = 12;
 
 export default function Index() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<GitHubUser | null>(null);
   const [repositories, setRepositories] = useState<GitHubRepository[]>([]);
   const [selectedRepo, setSelectedRepo] = useState<GitHubRepository | null>(null);
@@ -39,9 +41,16 @@ export default function Index() {
   } = useGitHubApi();
 
   const handleSearch = async (input: string) => {
+    // owner/repo or a github.com/owner/repo URL goes to code analysis; a bare name is a profile
+    const repoRef = parseRepoRef(input);
+    if (repoRef) {
+      navigate(`/import?repo=${encodeURIComponent(`${repoRef.owner}/${repoRef.repo}`)}`);
+      return;
+    }
+
     const username = extractUsername(input);
     if (!username) {
-      toast.error('Invalid GitHub username or URL');
+      toast.error('Invalid GitHub username, profile, or repository URL');
       return;
     }
 
@@ -174,7 +183,7 @@ export default function Index() {
               Search, filter, sort, and export repository data with ease.
             </p>
             <Link to="/import" className="mt-4 inline-block text-sm text-primary hover:underline">
-              RepoPilot: import a repository to analyze its source
+              Analyze a repository's source code
             </Link>
           </div>
 
