@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { chunkFile, rankPaths, searchChunks } from './search.ts';
+import { chunkFile, isAuxPath, rankPaths, searchChunks } from './search.ts';
 
 describe('chunkFile', () => {
   it('keeps exact 1-based line ranges that reproduce the source', () => {
@@ -14,7 +14,7 @@ describe('chunkFile', () => {
 describe('rankPaths', () => {
   it('prefers paths matching query terms, deterministically', () => {
     const paths = ['src/auth/login.ts', 'src/util.ts', 'README.md'];
-    expect(rankPaths(paths, 'where is login handled', 2)).toEqual(['src/auth/login.ts', 'README.md']);
+    expect(rankPaths(paths, 'where is login handled', 2)).toEqual(['src/auth/login.ts', 'src/util.ts']);
   });
 });
 
@@ -22,6 +22,18 @@ describe('rankPaths abbreviations', () => {
   it('matches a term that abbreviates a path word', () => {
     expect(rankPaths(['lib/util.js', 'lib/response.js', 'lib/application.js'], 'res.cookie options', 1)).toEqual(['lib/response.js']);
     expect(rankPaths(['lib/util.js', 'lib/response.js', 'lib/application.js'], 'app.use middleware', 1)).toEqual(['lib/application.js']);
+  });
+});
+
+describe('no path match: source files outrank CI, config and dot-directories', () => {
+  it('reproduces the itsdangerous failure (CI yaml and README used to win)', () => {
+    const paths = ['.github/workflows/publish.yaml', '.devcontainer/devcontainer.json', 'README.md', 'pyproject.toml', 'src/pkg/exc.py', 'src/pkg/signer.py', 'src/pkg/timed.py'];
+    expect(rankPaths(paths, 'Raised if a signature timestamp is older than max_age.', 3).sort()).toEqual(['src/pkg/exc.py', 'src/pkg/signer.py', 'src/pkg/timed.py']);
+  });
+  it('treats dot-directories and benchmark files as auxiliary', () => {
+    expect(isAuxPath('.github/workflows/ci.yml')).toBe(true);
+    expect(isAuxPath('src/parse.bench.ts')).toBe(true);
+    expect(isAuxPath('src/parse.ts')).toBe(false);
   });
 });
 

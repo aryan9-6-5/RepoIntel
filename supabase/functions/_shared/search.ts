@@ -23,7 +23,14 @@ export function chunkFile(path: string, text: string, size = 40): Chunk[] {
 }
 
 /** Tests, examples and fixtures rarely answer "how does X work"; rank them below source. */
-export const isAuxPath = (p: string) => /(^|\/)(tests?|__tests__|spec|examples?|fixtures?|docs?|benchmarks?)\//i.test(p) || /\.(test|spec)\.[a-z]+$/i.test(p) || /(^|\/)(history|changelog|changes|releases?|news)(\.[a-z]+)?$/i.test(p);
+export const isAuxPath = (p: string) =>
+  /(^|\/)(tests?|__tests__|spec|examples?|fixtures?|docs?|benchmarks?)\//i.test(p) ||
+  /(^|\/)\.[^/]+\//.test(p) || // dot-directories: .github, .devcontainer, .vscode ...
+  /\.(test|spec|bench)\.[a-z]+$/i.test(p) ||
+  /(^|\/)(history|changelog|changes|releases?|news)(\.[a-z]+)?$/i.test(p);
+
+const CODE = /\.(ts|tsx|js|jsx|mjs|cjs|py|go|rs|java|kt|rb|php|cs|c|h|cc|cpp|hpp|swift|scala|sh|sql|vue|svelte)$/i;
+const CONFIG = /\.(json|ya?ml|toml|ini|cfg|lock)$/i;
 
 /** Pick the paths most likely relevant to the query (path-term hits, README as fallback). */
 export function rankPaths(paths: string[], query: string, limit: number): string[] {
@@ -33,7 +40,9 @@ export function rankPaths(paths: string[], query: string, limit: number): string
     const words = l.split(/[^a-z0-9]+/).filter(Boolean);
     // exact substring, or the term abbreviates a path word (res -> response, app -> application)
     const hit = (t: string) => l.includes(t) || (t.length >= 3 && words.some((w) => w.startsWith(t)));
-    return ts.filter(hit).length * 10 - (isAuxPath(p) ? 15 : 0) + (/^readme/i.test(p) ? 1 : 0) - p.split('/').length * 0.01;
+    // prior when no path word matches: real source > docs > config/CI; shallower breaks ties
+    const prior = CODE.test(p) ? 4 : CONFIG.test(p) ? -2 : 0;
+    return ts.filter(hit).length * 10 + prior - (isAuxPath(p) ? 15 : 0) + (/^readme/i.test(p) ? 1 : 0) - p.split('/').length * 0.01;
   };
   return [...paths]
     .map((p) => [p, score(p)] as const)
