@@ -1,4 +1,4 @@
-# Live security probes (2026-10-19)
+# Live security probes (2026-10-20)
 
 Run: `node scripts/security-check.mjs` against the deployed Supabase functions using only the public publishable key. Paced to stay under the rate limit.
 

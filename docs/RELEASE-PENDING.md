@@ -1,6 +1,6 @@
 # Pending release (NOT deployed) - prepared 2026-10-20
 
-Status: reviewed locally, awaiting the owner's approval. Nothing below has been deployed, committed or pushed.
+STATUS 2026-10-21: DEPLOYED (repo-query v21, repo-analyze v12, repo-patch v9, repo-overview v6) and verified live (e2e 6/6, security 26/26); committed locally, not pushed. The 'not verified live' items below were checked after deploy; see docs/FINAL-CHECKLIST.md. Original plan text follows.
 
 ## What would be deployed
 Functions (Supabase project `hftgejaodmbmuvsqspon`), exactly four, because only these import changed modules:

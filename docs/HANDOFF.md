@@ -1,6 +1,6 @@
 # Handoff
 
-Updated: 2026-10-20 (round 3: evidence collected; release prepared but NOT deployed).
+Updated: 2026-10-21 (release deployed and verified; commits local, not pushed).
 
 1. **Objective:** RepoPilot (CLAUDE.md, PROJECT_PLAN.md). Live on Supabase project `hftgejaodmbmuvsqspon` (functions: summarize-repo, repo-ingest, repo-query, repo-analyze, repo-patch).
 2. **State:** see PROGRESS.md table. Everything is deployed except nothing needs deploying locally-only; `scripts/verify-patch.mjs` and `scripts/eval.mjs` run locally.
@@ -28,3 +28,10 @@ Updated: 2026-10-20 (round 3: evidence collected; release prepared but NOT deplo
 - BLOCKED: unseen bug-localization and Docker patch-verification benchmarks (free Groq budget exhausted; runnable commands in PROGRESS.md). Rerun after the quota resets or after deploying the fallback/quota-header code; check `quota` in responses first.
 - Verified: retrieval fix offline (held-out 43% -> 79%), security probes 26/26, axe 0 violations after fixes, migration live and enforced (earlier concurrency test: exactly 20 of 60 allowed).
 - Gotchas: stale background node processes from earlier sessions can keep burning Groq quota (kill eval-*.mjs); the browser tool times out at ~45 s per call; write regex code with the Write tool.
+
+## Round 4 status (2026-10-21) - read docs/FINAL-CHECKLIST.md first
+- Deployed and verified live (e2e 6/6, security 26/26). Local commits not pushed (5 ahead of origin/main as of the last commit, plus final docs/results to commit).
+- Owner actions left: push; Vercel frontend + URL (then set ALLOWED_ORIGINS); real screen-reader test; decide on a DB full-text index.
+- Honest quality picture: strong reading/citation/security/process; weak real-bug accuracy (held-out localization 50%, precision 22%, patch success 0/6).
+- Groq free tier: 8000 tokens/min, ~1000 req/day on gpt-oss-120b; pace AI calls ~35-60 s apart in evals.
+- Optional next engineering: full-text index (migration, needs approval), react-router v7 + Tailwind upgrades, stronger real-bug approach.
