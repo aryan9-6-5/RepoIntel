@@ -1,6 +1,6 @@
 # Handoff
 
-Updated: 2026-10-19 (round 2 in progress: M1-M3 done; M2 awaits deploy approval).
+Updated: 2026-10-20 (round 3: evidence collected; release prepared but NOT deployed).
 
 1. **Objective:** RepoPilot (CLAUDE.md, PROJECT_PLAN.md). Live on Supabase project `hftgejaodmbmuvsqspon` (functions: summarize-repo, repo-ingest, repo-query, repo-analyze, repo-patch).
 2. **State:** see PROGRESS.md table. Everything is deployed except nothing needs deploying locally-only; `scripts/verify-patch.mjs` and `scripts/eval.mjs` run locally.
@@ -22,3 +22,9 @@ Updated: 2026-10-19 (round 2 in progress: M1-M3 done; M2 awaits deploy approval)
 - Git: nothing committed since push at 6a24ee8 (user asked not to). Uncommitted: round-2 code, fixtures, scripts, docs, vercel.json, .npmrc, supabase/migrations. User's vite.config.ts/hello.txt untouched.
 - Gotchas: `.npmrc` legacy-peer-deps + swc pin are load-bearing; Groq free tier 429s; write regex code with the Write tool.
 - Next: commit (user asked not to commit yet) -> optional push; then real screen-reader pass, multi-IP test, frontend deploy.
+
+## Round 3 status (read docs/RELEASE-PENDING.md and PROGRESS.md "Round 3")
+- Pending approvals: (1) deploy 4 functions (repo-query, repo-analyze, repo-patch, repo-overview); (2) commit the local changes (user's vite.config.ts/hello.txt excluded); (3) optionally remove unused secret GEMINI_API_KEY.
+- BLOCKED: unseen bug-localization and Docker patch-verification benchmarks (free Groq budget exhausted; runnable commands in PROGRESS.md). Rerun after the quota resets or after deploying the fallback/quota-header code; check `quota` in responses first.
+- Verified: retrieval fix offline (held-out 43% -> 79%), security probes 26/26, axe 0 violations after fixes, migration live and enforced (earlier concurrency test: exactly 20 of 60 allowed).
+- Gotchas: stale background node processes from earlier sessions can keep burning Groq quota (kill eval-*.mjs); the browser tool times out at ~45 s per call; write regex code with the Write tool.
