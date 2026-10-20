@@ -38,3 +38,6 @@ Nothing here needs a paid plan or card. Do each step only with the owner's appro
 - Supabase `ALLOWED_ORIGINS` = `http://localhost:8080,http://localhost:5173,https://repointel-rho.vercel.app`. Any new frontend origin (custom domain, preview URL) must be added there or its API calls are blocked by CORS.
 - To redeploy: run the same command from the repo root. To connect Git auto-deploys later, set the two `VITE_*` variables in the Vercel project settings first.
 - Verified live: `/` and `/import` return 200 with the CSP/HSTS/nosniff headers; `/import` import + file viewer + grounded Q&A work; `/` finds 29 repos with avatars; 0 CSP violations; CORS allows the live origin and rejects others.
+
+## WARNING: Git pushes deploy automatically (found 2026-10-21)
+The Vercel project is connected to the GitHub repo, so every push to `main` builds and deploys production. The project now has `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` stored as environment variables (production and preview, added 2026-10-21); they are required (Vercel dashboard > Settings > Environment Variables, or `vercel env add`), otherwise the Git build ships without them and the site is blank (`supabaseUrl is required`). CLI deploys with `--build-env` do not store them. Always re-verify the live site after a push.
