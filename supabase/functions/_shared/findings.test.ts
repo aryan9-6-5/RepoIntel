@@ -32,6 +32,18 @@ describe('staticChecks benchmark', () => {
   });
 });
 
+describe('reproduction suggestions', () => {
+  it('every static finding explains how to try to reproduce it', () => {
+    for (const f of staticChecks(SEEDED)) expect(f.reproduction, f.rule).toBeTruthy();
+  });
+  it('keeps a model-provided reproduction (bounded) and omits blanks', () => {
+    const r = validateHypotheses([{ line: 2, title: 'a', reproduction: ' run run(null) ' }, { line: 2, title: 'b', reproduction: '   ' }, { line: 2, title: 'c', reproduction: 'x'.repeat(900) }], SEEDED);
+    expect(r[0].reproduction).toBe('run run(null)');
+    expect(r[1].reproduction).toBeUndefined();
+    expect(r[2].reproduction!.length).toBe(300);
+  });
+});
+
 describe('validateHypotheses', () => {
   it('drops findings pointing at non-existent lines and labels the rest unverified', () => {
     const r = validateHypotheses([{ line: 2, title: 'x', severity: 'high' }, { line: 999, title: 'bad' }, 'junk'], SEEDED);

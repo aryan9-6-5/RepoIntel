@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { buildMessages, checkCitations } from "../_shared/answer.ts";
 import { ingestRepo, type IngestResult } from "../_shared/ingest.ts";
 import { TtlCache, clientIp, overLimit } from "../_shared/limits.ts";
+import { chatError, groqChat } from "../_shared/llm.ts";
 import { buildTree, overviewFromPaths, parseManifest, pickManifests } from "../_shared/overview.ts";
 import { parseRepoRef } from "../_shared/repoUrl.ts";
 import { chunkFile, type Chunk } from "../_shared/search.ts";
@@ -58,22 +59,18 @@ serve(async (req) => {
       }))).flat();
       const facts = `Languages: ${overview.languages.map((l) => `${l.name} (${l.files})`).join(", ")}\nTop directories: ${overview.topDirs.slice(0, 8).map((d) => `${d.name} (${d.files})`).join(", ")}\nEntry points: ${overview.entryPoints.join(", ") || "none detected"}`;
       const msgs = buildMessages(`Summarize the architecture of this repository: purpose, main modules, and how the entry points connect. Detected facts (not from snippets):\n${facts}`, snippets);
-      const g = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
-        body: JSON.stringify({ model: "openai/gpt-oss-120b", messages: msgs, temperature: 0.2, max_tokens: 1500, reasoning_effort: "low" }),
-        signal: AbortSignal.timeout(25_000),
-      });
-      if (g.ok) {
-        const answer = (await g.json()).choices?.[0]?.message?.content;
-        if (typeof answer === "string" && answer.trim()) {
-          result.summary = answer;
-          result.citations = checkCitations(answer, snippets);
-          result.summarySources = snippets.map((s) => `${s.path}:${s.start}-${s.end}`);
-        } else result.summaryError = "AI returned an empty response";
+      const r = await groqChat(key, { messages: msgs, maxTokens: 2500, temperature: 0.2, reasoningEffort: "low" });
+      if (r.ok) {
+        result.summary = r.text;
+        result.citations = checkCitations(r.text, snippets);
+        result.summarySources = snippets.map((s) => `${s.path}:${s.start}-${s.end}`);
+        result.usage = r.usage;
+        result.aiMs = r.ms;
+        result.model = r.model;
+        result.fellBack = r.fellBack ?? false;
       } else {
-        console.error("Groq status:", g.status);
-        result.summaryError = g.status === 429 ? "AI rate limit reached. Try again shortly." : "AI service error";
+        console.error("Groq status:", r.status, r.code);
+        result.summaryError = chatError(r).error;
       }
     }
     return json(result);
