@@ -35,3 +35,6 @@ Updated: 2026-10-21 (release deployed and verified; commits local, not pushed).
 - Honest quality picture: strong reading/citation/security/process; weak real-bug accuracy (held-out localization 50%, precision 22%, patch success 0/6).
 - Groq free tier: 8000 tokens/min, ~1000 req/day on gpt-oss-120b; pace AI calls ~35-60 s apart in evals.
 - Optional next engineering: full-text index (migration, needs approval), react-router v7 + Tailwind upgrades, stronger real-bug approach.
+
+## Update 2026-10-21 (later): frontend is LIVE
+https://repointel-rho.vercel.app (Vercel project repointel, account aryan9-6-5). See docs/DEPLOY.md "Live deployment". Remaining owner items: real screen-reader test, DB index decision. Recommended next engineering: cap Q&A prompt size (a single answer can use ~7.6k of the 8k tokens/min free budget).

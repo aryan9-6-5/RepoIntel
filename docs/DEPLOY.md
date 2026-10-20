@@ -32,3 +32,9 @@ Nothing here needs a paid plan or card. Do each step only with the owner's appro
 
 ## Pre-release checklist
 `npx tsc -p tsconfig.app.json --noEmit` - `npm run lint` - `npm test` - `npm run build` - secret scan of `git ls-files` and `dist/` (`gsk_`, `ghp_`, `service_role`) - `node scripts/eval.mjs` (live) - open `/` and `/import` on the built app.
+
+## Live deployment (2026-10-21)
+- Frontend: https://repointel-rho.vercel.app (Vercel Hobby, project `repointel`, account aryan9-6-5, production deploy from the local working tree via `npx vercel deploy --prod --yes --build-env VITE_SUPABASE_URL=... --build-env VITE_SUPABASE_PUBLISHABLE_KEY=...`; only those two public values were passed). The folder is linked through `.vercel/` (gitignored).
+- Supabase `ALLOWED_ORIGINS` = `http://localhost:8080,http://localhost:5173,https://repointel-rho.vercel.app`. Any new frontend origin (custom domain, preview URL) must be added there or its API calls are blocked by CORS.
+- To redeploy: run the same command from the repo root. To connect Git auto-deploys later, set the two `VITE_*` variables in the Vercel project settings first.
+- Verified live: `/` and `/import` return 200 with the CSP/HSTS/nosniff headers; `/import` import + file viewer + grounded Q&A work; `/` finds 29 repos with avatars; 0 CSP violations; CORS allows the live origin and rejects others.

@@ -5,6 +5,8 @@ line-level citations that are verified against the retrieved code, flags likely 
 match versus an unverified model hypothesis), proposes minimal patches as reviewable diffs, and verifies patches only inside
 an isolated local Docker sandbox. It never applies, commits or pushes anything on its own.
 
+Live demo: https://repointel-rho.vercel.app (free tier: AI answers are rate limited).
+
 It evolved from GitHub Profile Explorer; the original profile explorer is still at `/`, RepoPilot is at `/import`.
 
 ## Architecture
