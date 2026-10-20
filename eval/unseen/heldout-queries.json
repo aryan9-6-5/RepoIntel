@@ -1,0 +1,128 @@
+[
+  {
+    "repo": "jshttp/mime-types",
+    "commit": "3a1187ee21388efe46b916d4991589d595bcb26c",
+    "path": "index.js",
+    "symbol": "populateMaps",
+    "defLine": 154,
+    "query": "how does populate maps work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "pallets-eco/blinker",
+    "commit": "c3364059663df1ddce32799d6b1922af89a345f6",
+    "path": "src/blinker/base.py",
+    "symbol": "receiver_connected",
+    "defLine": 42,
+    "query": "Emitted at the end of each :meth:connect call.",
+    "kind": "doc"
+  },
+  {
+    "repo": "pallets-eco/blinker",
+    "commit": "c3364059663df1ddce32799d6b1922af89a345f6",
+    "path": "src/blinker/_utilities.py",
+    "symbol": "make_id",
+    "defLine": 42,
+    "query": "Get a stable identifier for a receiver or sender, to be used as a dict",
+    "kind": "doc"
+  },
+  {
+    "repo": "sindresorhus/ky",
+    "commit": "3541888878c4d303a8bc2ad61815f4e048f55a5d",
+    "path": "source/core/Ky.ts",
+    "symbol": "cloneInitHookOptions",
+    "defLine": 312,
+    "query": "Clone mutable option properties so init hook mutations don't leak across requests.",
+    "kind": "doc"
+  },
+  {
+    "repo": "sindresorhus/ky",
+    "commit": "3541888878c4d303a8bc2ad61815f4e048f55a5d",
+    "path": "source/utils/delay.ts",
+    "symbol": "abortHandler",
+    "defLine": 19,
+    "query": "how does abort handler work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "sindresorhus/ky",
+    "commit": "3541888878c4d303a8bc2ad61815f4e048f55a5d",
+    "path": "source/utils/type-guards.ts",
+    "symbol": "isKyError",
+    "defLine": 36,
+    "query": "how does is ky error work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "python-attrs/attrs",
+    "commit": "ee66e7274852438cc23d4240a1a9cd632fda8b52",
+    "path": "typing_tests/baseline.py",
+    "symbol": "WithCustomRepr",
+    "defLine": 129,
+    "query": "how does with custom repr work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "python-attrs/attrs",
+    "commit": "ee66e7274852438cc23d4240a1a9cd632fda8b52",
+    "path": "src/attr/__init__.py",
+    "symbol": "AttrsInstance",
+    "defLine": 39,
+    "query": "how does attrs instance work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "python-attrs/attrs",
+    "commit": "ee66e7274852438cc23d4240a1a9cd632fda8b52",
+    "path": "src/attr/_funcs.py",
+    "symbol": "resolve_types",
+    "defLine": 425,
+    "query": "how does resolve types work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "python-attrs/attrs",
+    "commit": "ee66e7274852438cc23d4240a1a9cd632fda8b52",
+    "path": "src/attr/validators.py",
+    "symbol": "get_disabled",
+    "defLine": 61,
+    "query": "how does get disabled work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "python-attrs/attrs",
+    "commit": "ee66e7274852438cc23d4240a1a9cd632fda8b52",
+    "path": "src/attr/_cmp.py",
+    "symbol": "cmp_using",
+    "defLine": 13,
+    "query": "how does cmp using work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "python-attrs/attrs",
+    "commit": "ee66e7274852438cc23d4240a1a9cd632fda8b52",
+    "path": "src/attr/_version_info.py",
+    "symbol": "VersionInfo",
+    "defLine": 12,
+    "query": "how does version info work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "python-attrs/attrs",
+    "commit": "ee66e7274852438cc23d4240a1a9cd632fda8b52",
+    "path": "src/attr/_compat.py",
+    "symbol": "get_generic_base",
+    "defLine": 98,
+    "query": "If this is a generic class (A[str]), return the generic base for it.",
+    "kind": "doc"
+  },
+  {
+    "repo": "python-attrs/attrs",
+    "commit": "ee66e7274852438cc23d4240a1a9cd632fda8b52",
+    "path": "src/attr/converters.py",
+    "symbol": "optional_converter",
+    "defLine": 43,
+    "query": "how does optional converter work",
+    "kind": "symbol"
+  }
+]

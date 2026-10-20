@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Real-bug localization benchmark. Usage: node scripts/eval-real.mjs [runs=2]
+// Real-bug localization benchmark. Usage: node scripts/eval-real.mjs [runs=2] [dataset.json] [report.md]
 // Cases: eval/real-bugs.json (frozen real fix commits). The model sees the PRE-fix file only; a case is
 // "localized" when a finding lands within +-TOL lines of a line the real fix changed. Writes docs/EVAL-REAL.md.
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -12,10 +12,14 @@ const env = Object.fromEntries(
   readFileSync(new URL('../.env', import.meta.url), 'utf8').split(/\r?\n/).filter((l) => /^[A-Z_]+=/.test(l))
     .map((l) => { const i = l.indexOf('='); return [l.slice(0, i), l.slice(i + 1).replace(/^"|"$/g, '')]; }),
 );
-const all = JSON.parse(readFileSync(new URL('../eval/real-bugs.json', import.meta.url), 'utf8'));
+const DATASET = process.argv[3] ?? 'eval/real-bugs.json';
+const REPORT = process.argv[4] ?? 'docs/EVAL-REAL.md';
+const all = JSON.parse(readFileSync(new URL(`../${DATASET}`, import.meta.url), 'utf8'));
 const cases = all.filter((c) => !NON_BUG_MSG.test(c.message) && !NON_BUG_PATH.test(c.path));
 const runs = Number(process.argv[2] ?? 2);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// Free-tier Groq has a small tokens-per-minute budget: one 400-line analysis uses most of it, so pace calls (override with EVAL_PACE_MS)
+const PACE = Number(process.env.EVAL_PACE_MS ?? 60_000);
 
 async function analyze(body) {
   for (let t = 0; t < 4; t++) {
@@ -34,13 +38,17 @@ const rows = [];
 const T = { n: 0, localized: 0, findings: 0, near: 0, ok: 0, aiFail: 0, sizes: [] };
 const dist = (f, lines) => Math.min(...lines.map((l) => Math.abs(l - f.line)));
 
-for (let run = 1; run <= runs; run++) {
+let streak = 0; // consecutive AI failures; 3 in a row = quota is gone, stop instead of burning retries
+let aborted = false;
+for (let run = 1; run <= runs && !aborted; run++) {
   for (const c of cases) {
+    if (streak >= 3) { aborted = true; break; }
     const raw = await (await fetch(`https://raw.githubusercontent.com/${c.repo}/${c.parentSha}/${c.path}`)).text();
     const { status, d } = await analyze({ path: c.path, content: raw, llm: true });
-    await sleep(6_000);
+    await sleep(PACE);
     T.n++;
-    if (status !== 200 || d.llmStatus !== 'ok') { T.aiFail++; rows.push(`| ${run} | ${c.repo}/${c.path} | AI step failed (${d.llmStatus ?? status}) | - |`); continue; }
+    if (status !== 200 || d.llmStatus !== 'ok') { streak++; T.aiFail++; rows.push(`| ${run} | ${c.repo}/${c.path} | AI step failed (${d.llmStatus ?? status}) | - |`); continue; }
+    streak = 0;
     T.ok++;
     const f = d.findings ?? [];
     const near = f.filter((x) => dist(x, c.buggyLines) <= TOL);
@@ -52,13 +60,15 @@ for (let run = 1; run <= runs; run++) {
 const pct = (a, b) => (b ? `${a}/${b} (${Math.round((100 * a) / b)}%)` : 'n/a');
 const md = `# Real-bug localization benchmark (live, ${new Date().toISOString().slice(0, 10)}, ${runs} runs)
 
-Source: ${cases.length} real bug-fix commits from ${new Set(cases.map((c) => c.repo)).size} public repos (frozen in \`eval/real-bugs.json\`; ${all.length - cases.length} of ${all.length} collected commits excluded *before* running by a fixed non-bug rule: config/lint/typo/doc/build/bench paths or messages). The model sees only the pre-fix file; ground truth = lines the real fix changed; "localized" = a finding within +-${TOL} lines. Re-run: \`node scripts/eval-real.mjs\`.
+Source: ${cases.length} real bug-fix commits from ${new Set(cases.map((c) => c.repo)).size} public repos (frozen in \`${DATASET}\`; ${all.length - cases.length} of ${all.length} collected commits excluded *before* running by a fixed non-bug rule: config/lint/typo/doc/build/bench paths or messages). The model sees only the pre-fix file; ground truth = lines the real fix changed; "localized" = a finding within +-${TOL} lines. Re-run: \`node scripts/eval-real.mjs ${runs} ${DATASET} ${REPORT}\`.
 
 | Run | File | Result | Fix commit message |
 |-----|------|--------|--------------------|
 ${rows.join('\n')}
 
-## Measured
+${aborted ? `> INCOMPLETE: stopped after 3 consecutive AI failures (free-tier quota). Only ${T.n} analyses were attempted; numbers below cover completed ones only.
+
+` : ''}## Measured
 - Localization (analyses where the AI step completed): ${pct(T.localized, T.ok)}
 - Finding precision (findings within +-${TOL} lines of a real fixed line / all findings): ${pct(T.near, T.findings)}
 - Findings per file (mean): ${T.ok ? (T.findings / T.ok).toFixed(1) : 'n/a'}
@@ -71,5 +81,5 @@ ${rows.join('\n')}
 - Only localization is measured: no patch success on real repos (their tests were not run).
 - Single file visible to the model; fixes that depend on other files are unfair misses.
 `;
-writeFileSync(new URL('../docs/EVAL-REAL.md', import.meta.url), md);
+writeFileSync(new URL(`../${REPORT}`, import.meta.url), md);
 console.log(md);

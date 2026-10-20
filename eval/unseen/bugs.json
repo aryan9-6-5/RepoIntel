@@ -1,0 +1,507 @@
+[
+  {
+    "repo": "jshttp/cookie",
+    "lang": "js",
+    "fixSha": "4898ba23a59cb7196df35b58dedfe9a11b68fb91",
+    "parentSha": "408c2b40c6c5783fcfae619d30e8427e9c96a2db",
+    "path": "src/index.ts",
+    "message": "fix: `options.priority` used incorrect fallback (#207)",
+    "buggyLines": [
+      314,
+      315
+    ],
+    "fileLines": 373,
+    "testFiles": []
+  },
+  {
+    "repo": "jshttp/cookie",
+    "lang": "js",
+    "fixSha": "bc38ffd0eae716b199236dda061d0bdc74192dd3",
+    "parentSha": "cf4658f492c5bd96aeaf5693c3500f8495031014",
+    "path": "index.js",
+    "message": "Fix object assignment of `hasOwnProperty` (#177)",
+    "buggyLines": [
+      24,
+      133,
+      134
+    ],
+    "fileLines": 335,
+    "testFiles": []
+  },
+  {
+    "repo": "jshttp/cookie",
+    "lang": "js",
+    "fixSha": "5f22857c6e6b9784f7e1be0ee1b4fc13243098c4",
+    "parentSha": "da7e44e000c830ca5cc4f3c54c49e83bddb7f11b",
+    "path": "index.js",
+    "message": "Fix typo in JSDoc",
+    "buggyLines": [
+      236,
+      237
+    ],
+    "fileLines": 271,
+    "testFiles": []
+  },
+  {
+    "repo": "jshttp/cookie",
+    "lang": "js",
+    "fixSha": "24f7da040389e9a6b3c580a177f63e1b60e60706",
+    "parentSha": "faf389539824d5c973e4d9604ce89089941d820b",
+    "path": "index.js",
+    "message": "Fix for maxAge == 0",
+    "buggyLines": [
+      17,
+      18
+    ],
+    "fileLines": 71,
+    "testFiles": [
+      "test/serialize.js"
+    ]
+  },
+  {
+    "repo": "jshttp/cookie",
+    "lang": "js",
+    "fixSha": "1ae89665506141a1fb938116a626a84b63a23903",
+    "parentSha": "e86c4247578ff9c8a9479857031d6334b4fbdd54",
+    "path": "index.js",
+    "message": "fixed #5 ignore escape error and return original value better than throw the error.",
+    "buggyLines": [
+      46,
+      47
+    ],
+    "fileLines": 58,
+    "testFiles": [
+      "test/parse.js"
+    ]
+  },
+  {
+    "repo": "jshttp/cookie",
+    "lang": "js",
+    "fixSha": "cf11e6273e8be6b0f70f9f2fd52f9660a752ccec",
+    "parentSha": "408d14751376028c1a700c84f70c179262af0abe",
+    "path": "index.js",
+    "message": "Fixed typo in constructor that broke maxAge",
+    "buggyLines": [
+      16,
+      17
+    ],
+    "fileLines": 64,
+    "testFiles": []
+  },
+  {
+    "repo": "expressjs/cors",
+    "lang": "js",
+    "fixSha": "d603fdcc498aa1e34a81f2367cfd3eed06baad98",
+    "parentSha": "2c4e64718f08f5e2e7a9462c02b70863a42b9a1b",
+    "path": "lib/index.js",
+    "message": "Fix error when options delegate missing \"methods\" option",
+    "buggyLines": [
+      190,
+      191,
+      192,
+      193,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      223
+    ],
+    "fileLines": 240,
+    "testFiles": [
+      "test/cors.js"
+    ]
+  },
+  {
+    "repo": "expressjs/cors",
+    "lang": "js",
+    "fixSha": "ddc7d03e12db8e74d44b73aa6136b90b2bd25640",
+    "parentSha": "f5791b3fe3f8abeb24d035cece394adb2af24596",
+    "path": "lib/index.js",
+    "message": "fix tests",
+    "buggyLines": [
+      184,
+      185
+    ],
+    "fileLines": 243,
+    "testFiles": []
+  },
+  {
+    "repo": "expressjs/cors",
+    "lang": "js",
+    "fixSha": "a14f3bca9c715dc69268fbf823af4b02e044703c",
+    "parentSha": "9959d2e4301bfb76e150c1c65e5ecd28924269fb",
+    "path": "lib/index.js",
+    "message": "Fix \"Vary: origin\" header added for \"*\"",
+    "buggyLines": [
+      15,
+      16
+    ],
+    "fileLines": 199,
+    "testFiles": []
+  },
+  {
+    "repo": "expressjs/cors",
+    "lang": "js",
+    "fixSha": "0c843f9f56399902ab713c4045fd1dbf1603da27",
+    "parentSha": "c78ed4285d59cf7a7835e33326eb63707bc1705a",
+    "path": "lib/index.js",
+    "message": "fix lint errors",
+    "buggyLines": [
+      92,
+      105
+    ],
+    "fileLines": 193,
+    "testFiles": [
+      "test/cors.js"
+    ]
+  },
+  {
+    "repo": "expressjs/cors",
+    "lang": "js",
+    "fixSha": "e456c51b54fc281b72eee3ffd7a3003f3061f44a",
+    "parentSha": "6f607e391ec05ba562195f7d7d8854d1d2dcfa84",
+    "path": "lib/index.js",
+    "message": "fix: Normalize method names to use uppercase before comparison.",
+    "buggyLines": [
+      100,
+      101
+    ],
+    "fileLines": 187,
+    "testFiles": [
+      "test/cors.js"
+    ]
+  },
+  {
+    "repo": "expressjs/cors",
+    "lang": "js",
+    "fixSha": "3100a7cfb7b45b4e2c3f61c25d99ad39264a3a69",
+    "parentSha": "cead8b3d881b0618443819fe82565dcd71312920",
+    "path": "lib/index.js",
+    "message": "Bug fix. Do not override options.origin callback.",
+    "buggyLines": [
+      169,
+      170,
+      171
+    ],
+    "fileLines": 186,
+    "testFiles": [
+      "test/cors.js"
+    ]
+  },
+  {
+    "repo": "mde/ejs",
+    "lang": "js",
+    "fixSha": "6e1289c3344e8b3aeb4f7ecd8ae70c36be8664df",
+    "parentSha": "5090873fbff032d61968a32232346fafa65b06d2",
+    "path": "jakefile.js",
+    "message": "Fix minification",
+    "buggyLines": [
+      83,
+      84
+    ],
+    "fileLines": 133,
+    "testFiles": []
+  },
+  {
+    "repo": "mde/ejs",
+    "lang": "js",
+    "fixSha": "bb4e4a4d6448988d18ae9411095237174586f277",
+    "parentSha": "fac12271cbfd0aed482e09ba65b4c2d4f99c5201",
+    "path": "bin/cli.js",
+    "message": "Fix cli includes by defaulting views to the current working directory",
+    "buggyLines": [
+      151
+    ],
+    "fileLines": 209,
+    "testFiles": []
+  },
+  {
+    "repo": "mde/ejs",
+    "lang": "js",
+    "fixSha": "755d70c1700f2ab36ba5632ca482b40f0edad04f",
+    "parentSha": "685f5ef0bc720c6cc51004e22c1d6329df6bad29",
+    "path": "bin/cli.js",
+    "message": "Fix wrong output file option in cli",
+    "buggyLines": [
+      155,
+      156
+    ],
+    "fileLines": 164,
+    "testFiles": []
+  },
+  {
+    "repo": "mde/ejs",
+    "lang": "js",
+    "fixSha": "df5c21b405a00349ea3550ab93a7dc9de06fdfc7",
+    "parentSha": "528444868c3749c4d459ce8d0d87840b9b18f571",
+    "path": "lib/utils.js",
+    "message": "Fix indentation",
+    "buggyLines": [
+      34,
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "fileLines": 48,
+    "testFiles": []
+  },
+  {
+    "repo": "jshttp/negotiator",
+    "lang": "js",
+    "fixSha": "f0146d03621031bfe17f7fb373db8a7f72cf6ace",
+    "parentSha": "251627cad559f8fbcb6c183f499dcc04ba7c28d6",
+    "path": "index.js",
+    "message": "fix(test): fixed up preferred encoding tests",
+    "buggyLines": [
+      53,
+      54
+    ],
+    "fileLines": 84,
+    "testFiles": [
+      "test/encoding.js"
+    ]
+  },
+  {
+    "repo": "jshttp/negotiator",
+    "lang": "js",
+    "fixSha": "251627cad559f8fbcb6c183f499dcc04ba7c28d6",
+    "parentSha": "45e5429b604b549d90a3f5dd3aa61456de09f88f",
+    "path": "index.js",
+    "message": "fix: old eslint did not like destructuring",
+    "buggyLines": [
+      52,
+      53,
+      54
+    ],
+    "fileLines": 83,
+    "testFiles": []
+  },
+  {
+    "repo": "jshttp/negotiator",
+    "lang": "js",
+    "fixSha": "d0d95c8fa833cf4ffa97458f9d7521ab9e01d4d9",
+    "parentSha": "751c381c32707f238143cd65d78520e16f4ef9e5",
+    "path": "lib/language.js",
+    "message": "Fix typo in variable name",
+    "buggyLines": [
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "fileLines": 180,
+    "testFiles": []
+  },
+  {
+    "repo": "jshttp/negotiator",
+    "lang": "js",
+    "fixSha": "e2273708e6ed82586624c6572f0de35d09dc4be7",
+    "parentSha": "3cf8d0e003140c83b892ddfd33dcf0a72ce007b4",
+    "path": "lib/encoding.js",
+    "message": "Fix missing identity encoding when q=0 exists",
+    "buggyLines": [
+      15,
+      16
+    ],
+    "fileLines": 117,
+    "testFiles": [
+      "test/encoding.js"
+    ]
+  },
+  {
+    "repo": "jshttp/negotiator",
+    "lang": "js",
+    "fixSha": "cda91822a4c0e554da04f1a45413323efa7ab965",
+    "parentSha": "cb76bd39d4e42d9b87146595f3c5780859aab0fa",
+    "path": "lib/mediaType.js",
+    "message": "Fix error when media type has invalid parameter",
+    "buggyLines": [
+      81,
+      82
+    ],
+    "fileLines": 123,
+    "testFiles": [
+      "test/mediaType.js"
+    ]
+  },
+  {
+    "repo": "jshttp/negotiator",
+    "lang": "js",
+    "fixSha": "6cfaec2ef1bc96261a7d297f1279ecec40fb57bb",
+    "parentSha": "e07418f3ce584fabcb4966363f4a97b57d28fb18",
+    "path": "lib/mediaType.js",
+    "message": "Fixing global leak.",
+    "buggyLines": [
+      13,
+      14
+    ],
+    "fileLines": 99,
+    "testFiles": []
+  },
+  {
+    "repo": "sindresorhus/p-limit",
+    "lang": "js",
+    "fixSha": "ef37eb2f372d385883d113803c98ba0bf3828ad1",
+    "parentSha": "42599ebbbb1228a5bdab381fcf8f4ac20eb8d551",
+    "path": "index.js",
+    "message": "Fix detached limit.map calls (#108)",
+    "buggyLines": [
+      108,
+      109
+    ],
+    "fileLines": 128,
+    "testFiles": [
+      "test.js"
+    ]
+  },
+  {
+    "repo": "sindresorhus/p-limit",
+    "lang": "js",
+    "fixSha": "1fb1407cb390019b004bfa66585ab5e3de1de7bd",
+    "parentSha": "7bdd25c703337360236722ed7d4da5ffadcb7a08",
+    "path": "benchmark.js",
+    "message": "Fix benchmarks",
+    "buggyLines": [
+      218,
+      219,
+      222,
+      223
+    ],
+    "fileLines": 235,
+    "testFiles": []
+  },
+  {
+    "repo": "sindresorhus/p-limit",
+    "lang": "js",
+    "fixSha": "ccb80b2721a6a4a27ce5ad7721fe939162a35b31",
+    "parentSha": "c944e4a4363ff41a7202d5dec346cc174c3ecf49",
+    "path": "index.d.ts",
+    "message": "Fix `limitFunction` type",
+    "buggyLines": [
+      36,
+      37,
+      93,
+      94,
+      95
+    ],
+    "fileLines": 96,
+    "testFiles": [
+      "index.test-d.ts"
+    ]
+  },
+  {
+    "repo": "sindresorhus/p-limit",
+    "lang": "js",
+    "fixSha": "4ab2813001fae4345d02e7fee394222cffd371d9",
+    "parentSha": "824edb836eedc9929ea383457cd82d8367f7322e",
+    "path": "index.js",
+    "message": "Fix error on invalid concurrency (#35)",
+    "buggyLines": [
+      6,
+      7
+    ],
+    "fileLines": 70,
+    "testFiles": [
+      "test.js"
+    ]
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "lang": "py",
+    "fixSha": "c294b2fb47447d83be02470525c9c6292ce5fd74",
+    "parentSha": "91952b90cd5c9e8b36f20a2bf05e0496e55c13c3",
+    "path": "src/itsdangerous/timed.py",
+    "message": "fix pyright findings",
+    "buggyLines": [
+      57,
+      58,
+      175,
+      176
+    ],
+    "fileLines": 229,
+    "testFiles": []
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "lang": "py",
+    "fixSha": "1e3a10002994f15f882fe8170cc388dd82ccf722",
+    "parentSha": "ea267c1d3b16cf1fffd3c21d0ea174fc8bcbe73c",
+    "path": "src/itsdangerous/_compat.py",
+    "message": "Fix typo",
+    "buggyLines": [
+      24,
+      25
+    ],
+    "fileLines": 47,
+    "testFiles": []
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "lang": "py",
+    "fixSha": "6910fe0a745cbe22d65583d7031d97bb9a92ce49",
+    "parentSha": "e569397e31892d7ddadfaa16997b732cddb79e2b",
+    "path": "src/itsdangerous/serializer.py",
+    "message": "Fix typo",
+    "buggyLines": [
+      38,
+      39
+    ],
+    "fileLines": 219,
+    "testFiles": []
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "lang": "py",
+    "fixSha": "41ee5ea087defe9c3564381470e0277f55cfa641",
+    "parentSha": "59f3bf7877e21af8e5571993edb6834744858583",
+    "path": "setup.py",
+    "message": "Fixed typo and improved wording in the docs",
+    "buggyLines": [
+      11,
+      12
+    ],
+    "fileLines": 21,
+    "testFiles": [
+      "docs/index.rst"
+    ]
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "lang": "py",
+    "fixSha": "ea10d2dbec992bb9ee807638f701775765fb2462",
+    "parentSha": "59067a939ce5d838622b11a5a70c2eceefcacb54",
+    "path": "itsdangerous.py",
+    "message": "Fix issue #3 and add proper unit test.",
+    "buggyLines": [
+      274,
+      275,
+      276
+    ],
+    "fileLines": 335,
+    "testFiles": [
+      "tests.py"
+    ]
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "lang": "py",
+    "fixSha": "d5b350b46bc26b738bd5262f482fbf11001b3b4a",
+    "parentSha": "736a57b35a190d6d1fc10bc2efb00ce2d8445625",
+    "path": "itsdangerous.py",
+    "message": "Fixed a bug that caused the library not to accept unicode strings",
+    "buggyLines": [
+      110,
+      111
+    ],
+    "fileLines": 301,
+    "testFiles": [
+      "tests.py"
+    ]
+  }
+]

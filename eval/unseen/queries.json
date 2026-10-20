@@ -1,0 +1,182 @@
+[
+  {
+    "repo": "jshttp/cookie",
+    "commit": "51c485421a95ee796de6d8dab53a5ade0a20db8a",
+    "path": "src/parse-cookie.bench.ts",
+    "symbol": "genCookies",
+    "defLine": 51,
+    "query": "how does gen cookies work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "jshttp/cookie",
+    "commit": "51c485421a95ee796de6d8dab53a5ade0a20db8a",
+    "path": "src/stringify-cookie.bench.ts",
+    "symbol": "genCookies",
+    "defLine": 49,
+    "query": "how does gen cookies work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "jshttp/cookie",
+    "commit": "51c485421a95ee796de6d8dab53a5ade0a20db8a",
+    "path": "src/index.ts",
+    "symbol": "eqIndex",
+    "defLine": 486,
+    "query": "Find the next = character, or return len.",
+    "kind": "doc"
+  },
+  {
+    "repo": "expressjs/cors",
+    "commit": "5317ebe670db2aaebc1d496eb5d33493deefb3ed",
+    "path": "lib/index.js",
+    "symbol": "isOriginAllowed",
+    "defLine": 19,
+    "query": "how does is origin allowed work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "mde/ejs",
+    "commit": "88bd19074205f01df65dc9f118fb1a0000c40ec8",
+    "path": "jakelib/ecosystem.js",
+    "symbol": "hasBinary",
+    "defLine": 8,
+    "query": "how does has binary work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "mde/ejs",
+    "commit": "88bd19074205f01df65dc9f118fb1a0000c40ec8",
+    "path": "bin/cli.js",
+    "symbol": "handlePipeError",
+    "defLine": 32,
+    "query": "If the consumer closes our output pipe (e.g.",
+    "kind": "doc"
+  },
+  {
+    "repo": "mde/ejs",
+    "commit": "88bd19074205f01df65dc9f118fb1a0000c40ec8",
+    "path": "lib/esm/utils.js",
+    "symbol": "escapeXMLToString",
+    "defLine": 103,
+    "query": "how does escape xmlto string work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "mde/ejs",
+    "commit": "88bd19074205f01df65dc9f118fb1a0000c40ec8",
+    "path": "lib/esm/ejs.js",
+    "symbol": "resolvePaths",
+    "defLine": 133,
+    "query": "Try to resolve file path on multiple directories",
+    "kind": "doc"
+  },
+  {
+    "repo": "jshttp/negotiator",
+    "commit": "14b0a7b88e7e7bb1cae38681195951bff29ca2fd",
+    "path": "lib/encoding.js",
+    "symbol": "getEncodingPriority",
+    "defLine": 77,
+    "query": "how does get encoding priority work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "jshttp/negotiator",
+    "commit": "14b0a7b88e7e7bb1cae38681195951bff29ca2fd",
+    "path": "lib/language.js",
+    "symbol": "getLanguagePriority",
+    "defLine": 65,
+    "query": "how does get language priority work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "jshttp/negotiator",
+    "commit": "14b0a7b88e7e7bb1cae38681195951bff29ca2fd",
+    "path": "lib/accept.js",
+    "symbol": "parseAccept",
+    "defLine": 23,
+    "query": "how does parse accept work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "jshttp/negotiator",
+    "commit": "14b0a7b88e7e7bb1cae38681195951bff29ca2fd",
+    "path": "lib/mediaType.js",
+    "symbol": "compareSpecs",
+    "defLine": 156,
+    "query": "how does compare specs work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "jshttp/negotiator",
+    "commit": "14b0a7b88e7e7bb1cae38681195951bff29ca2fd",
+    "path": "lib/charset.js",
+    "symbol": "getCharsetPriority",
+    "defLine": 58,
+    "query": "how does get charset priority work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "sindresorhus/p-limit",
+    "commit": "a8a6fbec4e0e866d6d779b10889bb4f5567e70eb",
+    "path": "index.js",
+    "symbol": "validateConcurrency",
+    "defLine": 144,
+    "query": "how does validate concurrency work",
+    "kind": "symbol"
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "commit": "672971d66a2ef9f85151e53283113f33d642dabd",
+    "path": "src/itsdangerous/url_safe.py",
+    "symbol": "URLSafeSerializer",
+    "defLine": 72,
+    "query": "Works like :class:.Serializer but dumps and loads into a URL",
+    "kind": "doc"
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "commit": "672971d66a2ef9f85151e53283113f33d642dabd",
+    "path": "src/itsdangerous/encoding.py",
+    "symbol": "base64_encode",
+    "defLine": 20,
+    "query": "Base64 encode a string of bytes or text.",
+    "kind": "doc"
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "commit": "672971d66a2ef9f85151e53283113f33d642dabd",
+    "path": "src/itsdangerous/exc.py",
+    "symbol": "SignatureExpired",
+    "defLine": 60,
+    "query": "Raised if a signature timestamp is older than max_age.",
+    "kind": "doc"
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "commit": "672971d66a2ef9f85151e53283113f33d642dabd",
+    "path": "src/itsdangerous/serializer.py",
+    "symbol": "make_signer",
+    "defLine": 278,
+    "query": "Creates a new instance of the signer to be used.",
+    "kind": "doc"
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "commit": "672971d66a2ef9f85151e53283113f33d642dabd",
+    "path": "src/itsdangerous/timed.py",
+    "symbol": "timestamp_to_datetime",
+    "defLine": 35,
+    "query": "Convert the timestamp from :meth:get_timestamp into an",
+    "kind": "doc"
+  },
+  {
+    "repo": "pallets/itsdangerous",
+    "commit": "672971d66a2ef9f85151e53283113f33d642dabd",
+    "path": "src/itsdangerous/signer.py",
+    "symbol": "verify_signature",
+    "defLine": 24,
+    "query": "Verifies the given signature matches the expected",
+    "kind": "doc"
+  }
+]
