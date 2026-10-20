@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { buildMessages, checkCitations } from "../_shared/answer.ts";
+import { answerWithCitations, buildMessages, fitSnippets } from "../_shared/answer.ts";
 import { ingestRepo, type IngestResult } from "../_shared/ingest.ts";
 import { TtlCache, clientIp, overLimit } from "../_shared/limits.ts";
 import { Memo, chatError, groqChat } from "../_shared/llm.ts";
@@ -53,13 +53,18 @@ serve(async (req) => {
 
       const key = Deno.env.get("GROQ_API_KEY");
       if (!key) return { status: 503, body: { error: "AI service is not configured" } };
-      const r = await groqChat(key, { messages: buildMessages(query, snippets), maxTokens: 1500, reasoningEffort: "low", temperature: 0.2 });
+      // Free tier allows 8000 tokens/min per model: send at most ~10k chars of snippets (~3k tokens) and cap the output.
+      const sent = fitSnippets(snippets);
+      const { result: r, citations, retried } = await answerWithCitations(
+        (messages) => groqChat(key, { messages, maxTokens: 900, reasoningEffort: "low", temperature: 0.2 }),
+        buildMessages(query, sent), sent,
+      );
       if (!r.ok) {
         console.error("Groq status:", r.status, r.code);
         const e = chatError(r);
         return { status: e.status, body: { ...base, error: e.error, upstreamStatus: r.status, upstreamCode: r.code, quota: r.quota } };
       }
-      return { status: 200, body: { ...base, answer: r.text, citations: checkCitations(r.text, snippets), usage: r.usage, aiMs: r.ms, model: r.model, fellBack: r.fellBack ?? false, quota: r.quota } };
+      return { status: 200, body: { ...base, answer: r.text, citations, snippetsSent: sent.length, retried, usage: r.usage, aiMs: r.ms, model: r.model, fellBack: r.fellBack ?? false, quota: r.quota } };
     };
 
     // Only answered questions are memoized (retrieval-only calls are cheap and not LLM-bound).
