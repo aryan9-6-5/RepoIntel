@@ -1,6 +1,6 @@
-import { useState, useMemo, useCallback } from 'react';
+import { lazy, Suspense, useState, useMemo, useCallback } from 'react';
 import { Github } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { ProfileInput } from '@/components/ProfileInput';
 import { UserProfile } from '@/components/UserProfile';
 import { RepoFilters } from '@/components/RepoFilters';
@@ -16,8 +16,15 @@ import { toast } from 'sonner';
 
 const REPOS_PER_PAGE = 12;
 
+// loaded on demand: it carries the Markdown renderer
+const CodeAnalysis = lazy(() => import('@/components/CodeAnalysis'));
+
 export default function Index() {
-  const navigate = useNavigate();
+  // the repo being analyzed lives in the URL (?analyze=owner/repo), so refresh and the back button work
+  const [searchParams, setSearchParams] = useSearchParams();
+  const analyzeRepo = searchParams.get('analyze') && parseRepoRef(searchParams.get('analyze')!) ? searchParams.get('analyze')! : null;
+  const openAnalysis = (repo: string) => setSearchParams({ analyze: repo });
+  const closeAnalysis = () => setSearchParams({});
   const [user, setUser] = useState<GitHubUser | null>(null);
   const [repositories, setRepositories] = useState<GitHubRepository[]>([]);
   const [selectedRepo, setSelectedRepo] = useState<GitHubRepository | null>(null);
@@ -41,10 +48,10 @@ export default function Index() {
   } = useGitHubApi();
 
   const handleSearch = async (input: string) => {
-    // owner/repo or a github.com/owner/repo URL goes to code analysis; a bare name is a profile
+    // owner/repo or a github.com/owner/repo URL opens code analysis; a bare name is a profile
     const repoRef = parseRepoRef(input);
     if (repoRef) {
-      navigate(`/import?repo=${encodeURIComponent(`${repoRef.owner}/${repoRef.repo}`)}`);
+      openAnalysis(`${repoRef.owner}/${repoRef.repo}`);
       return;
     }
 
@@ -179,12 +186,9 @@ export default function Index() {
               <span className="text-gradient">GitHub</span> Repo Explorer
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Discover and explore public repositories from any GitHub profile. 
-              Search, filter, sort, and export repository data with ease.
+              Discover and explore public repositories from any GitHub profile, 
+              or paste owner/repo to analyze its source code.
             </p>
-            <Link to="/import" className="mt-4 inline-block text-sm text-primary hover:underline">
-              Analyze a repository's source code
-            </Link>
           </div>
 
           <ProfileInput onSubmit={handleSearch} loading={loading} />
@@ -193,15 +197,21 @@ export default function Index() {
 
       {/* Content Section */}
       <section className="container px-4 mx-auto pb-16">
-        {rateLimit && <RateLimitBanner rateLimit={rateLimit} />}
+        {analyzeRepo && (
+          <Suspense fallback={<p role="status" className="text-sm text-muted-foreground">Loading...</p>}>
+            <CodeAnalysis key={analyzeRepo} repo={analyzeRepo} onClose={closeAnalysis} />
+          </Suspense>
+        )}
 
-        {loading && <LoadingSkeleton />}
+        {!analyzeRepo && rateLimit && <RateLimitBanner rateLimit={rateLimit} />}
 
-        {error && !loading && (
+        {!analyzeRepo && loading && <LoadingSkeleton />}
+
+        {!analyzeRepo && error && !loading && (
           <EmptyState type="error" message={error} />
         )}
 
-        {!loading && !error && user && (
+        {!analyzeRepo && !loading && !error && user && (
           <div className="space-y-6">
             <UserProfile user={user} repositories={repositories} />
 
@@ -224,6 +234,7 @@ export default function Index() {
                           key={repo.id}
                           repo={repo}
                           onClick={() => handleRepoClick(repo)}
+                          onAnalyze={openAnalysis}
                           index={index}
                         />
                       ))}
@@ -291,6 +302,7 @@ export default function Index() {
         repo={selectedRepo}
         open={modalOpen}
         onClose={() => setModalOpen(false)}
+        onAnalyze={openAnalysis}
       />
     </main>
   );

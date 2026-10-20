@@ -13,7 +13,7 @@ Nothing here needs a paid plan or card. Do each step only with the owner's appro
    `verify_jwt = true` is set in `supabase/config.toml`; the browser sends the publishable key automatically.
 
 ## Frontend (Vercel Hobby, non-commercial use)
-- Framework preset: Vite. Build `npm run build`, output `dist`. `vercel.json` provides the SPA rewrite (deep links like `/import` survive refresh) and security headers (CSP, nosniff, HSTS, frame-ancestors none).
+- Framework preset: Vite. Build `npm run build`, output `dist`. `vercel.json` provides the SPA rewrite (deep links like `/?analyze=owner/repo` survive refresh) and security headers (CSP, nosniff, HSTS, frame-ancestors none).
 - Env vars in Vercel: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` only.
 - Order matters: set `ALLOWED_ORIGINS` to the Vercel URL BEFORE the first visit, otherwise every API call is blocked by CORS.
 - If you add another origin/API to the frontend, extend `connect-src` in `vercel.json` or the browser will block it (tested locally: no CSP violations for `/` and `/import`).

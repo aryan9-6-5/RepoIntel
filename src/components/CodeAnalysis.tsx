@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { FileCode2, Loader2, Search } from 'lucide-react';
+import { FileCode2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
@@ -65,10 +64,7 @@ async function readFunctionError(error: unknown): Promise<string> {
   return 'Could not import the repository. Please try again.';
 }
 
-export default function RepoImport() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const repoParam = searchParams.get('repo') || '';
-  const [input, setInput] = useState(repoParam);
+export default function CodeAnalysis({ repo, onClose }: { repo: string; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<IngestSuccess | null>(null);
@@ -84,7 +80,7 @@ export default function RepoImport() {
     setAsking(true);
     try {
       const { data, error: fnError } = await supabase.functions.invoke('repo-query', {
-        body: { repo: input, query: question, ask: true },
+        body: { repo, query: question, ask: true },
       });
       if (fnError) throw fnError;
       setAnswer(data as Answer);
@@ -125,7 +121,7 @@ export default function RepoImport() {
     setHl([+m[2], +m[3]]);
   };
 
-  const loadOverview = async (withSummary: boolean, repoTarget = input) => {
+  const loadOverview = async (withSummary: boolean, repoTarget = repo) => {
     const r = await call<Explorer>('repo-overview', { repo: repoTarget, summary: withSummary }, 'overview');
     if (r) setExplorer(r);
   };
@@ -133,13 +129,13 @@ export default function RepoImport() {
   const analyze = async (path: string) => {
     setProposal(null);
     setAnalysis(null);
-    const r = await call<{ commitSha: string; findings: FindingT[]; llmStatus: string }>('repo-analyze', { repo: input, path, llm: true }, path);
+    const r = await call<{ commitSha: string; findings: FindingT[]; llmStatus: string }>('repo-analyze', { repo, path, llm: true }, path);
     if (r) setAnalysis({ path, ...r });
   };
 
   const propose = async (f: FindingT) => {
     if (!analysis) return;
-    const r = await call<Proposal>('repo-patch', { repo: input, path: analysis.path, line: f.line, title: f.title, rationale: f.rationale }, `fix-${f.line}`);
+    const r = await call<Proposal>('repo-patch', { repo, path: analysis.path, line: f.line, title: f.title, rationale: f.rationale }, `fix-${f.line}`);
     if (r) setProposal(r);
   };
 
@@ -158,7 +154,6 @@ export default function RepoImport() {
       setExplorer(null);
       setSelected(null);
       setHl(null);
-      setSearchParams({ repo: targetRepo });
       void loadOverview(false, targetRepo);
     } catch (err) {
       setError(await readFunctionError(err));
@@ -167,40 +162,24 @@ export default function RepoImport() {
     }
   };
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    void runIngest(input);
-  };
-
-  // /import?repo=owner/repo analyzes that repo on load (once; runIngest then keeps the URL in sync)
-  const autoStarted = useRef(false);
+  // the parent mounts this per repo (key={repo}), so start once on mount
+  const started = useRef(false);
   useEffect(() => {
-    if (repoParam && !autoStarted.current) {
-      autoStarted.current = true;
-      void runIngest(repoParam);
+    if (!started.current) {
+      started.current = true;
+      void runIngest(repo);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <main className="container mx-auto max-w-3xl px-4 py-10">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Analyze a repository</h1>
+    <section className="mx-auto max-w-3xl space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="truncate text-lg font-semibold text-foreground">Code analysis: {repo}</h2>
+        <Button variant="outline" size="sm" onClick={onClose}>Back to repositories</Button>
       </div>
 
-      <form onSubmit={submit} className="mb-6 flex gap-2">
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="owner/repo or https://github.com/owner/repo"
-          aria-label="GitHub repository"
-          maxLength={300}
-        />
-        <Button type="submit" disabled={loading || !input.trim()}>
-          {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}
-          Import
-        </Button>
-      </form>
+      {loading && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" aria-label="Importing repository" />}
 
       {error && (
         <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-red-400">
@@ -361,6 +340,6 @@ export default function RepoImport() {
           </div>
         </section>
       )}
-    </main>
+    </section>
   );
 }

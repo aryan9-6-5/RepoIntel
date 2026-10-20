@@ -34,7 +34,7 @@ Status words: PASS = criterion met and verified with evidence; PARTIAL = built b
 | Push commits to GitHub | owner says "push" |
 | ~~Deploy frontend on Vercel~~ done 2026-10-21 | done |
 | Cap Q&A prompt size to stay inside the 8,000 tokens/min free budget | me, on request |
-| Real screen-reader pass of /import | owner |
+| Real screen-reader pass of the code-analysis view (opens from Analyze) | owner |
 | Decide on a database full-text index (needs a migration) | owner |
 | react-router v7 and Tailwind upgrades (clear remaining audit findings) | me, on request |
 | Improve real-bug accuracy (stronger model, multi-file reasoning, test-guided patching) | open-ended; limited by Groq free tier (8,000 tokens/min) |

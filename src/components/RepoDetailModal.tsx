@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { GitHubRepository } from '@/types/github';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -26,9 +25,10 @@ interface RepoDetailModalProps {
   repo: GitHubRepository | null;
   open: boolean;
   onClose: () => void;
+  onAnalyze: (repo: string) => void;
 }
 
-export function RepoDetailModal({ repo, open, onClose }: RepoDetailModalProps) {
+export function RepoDetailModal({ repo, open, onClose, onAnalyze }: RepoDetailModalProps) {
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [loadingSummary, setLoadingSummary] = useState(false);
 
@@ -152,10 +152,8 @@ export function RepoDetailModal({ repo, open, onClose }: RepoDetailModalProps) {
           )}
 
           <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
-            <Button asChild className="flex-1" size="lg">
-              <Link to={`/import?repo=${encodeURIComponent(repo.full_name)}`}>
-                Analyze code
-              </Link>
+            <Button className="flex-1" size="lg" onClick={() => { onClose(); onAnalyze(repo.full_name); }}>
+              Analyze code
             </Button>
             <Button asChild variant="outline" className="flex-1" size="lg">
               <a href={repo.html_url} target="_blank" rel="noopener noreferrer">

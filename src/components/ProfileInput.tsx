@@ -25,7 +25,7 @@ export function ProfileInput({ onSubmit, loading }: ProfileInputProps) {
           <Github className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Enter GitHub username or profile URL..."
+            placeholder="GitHub username, or owner/repo to analyze its code..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="pl-12 pr-4 h-14 text-base bg-card/60 border-border/60"

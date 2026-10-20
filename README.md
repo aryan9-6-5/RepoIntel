@@ -7,7 +7,7 @@ an isolated local Docker sandbox. It never applies, commits or pushes anything o
 
 Live demo: https://repointel-rho.vercel.app (free tier: AI answers are rate limited).
 
-It evolved from GitHub Profile Explorer; the original profile explorer is still at `/`, RepoPilot is at `/import`.
+It evolved from GitHub Profile Explorer; it is one page: search a profile and click Analyze on a repository (or type `owner/repo` in the search box) to open the code analysis in place. `/?analyze=owner/repo` is a shareable link, and old `/import?repo=` links redirect to it.
 
 ## Architecture
 ```

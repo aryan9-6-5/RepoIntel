@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { Star, GitFork, Eye, Calendar, Code2, ExternalLink } from 'lucide-react';
 import { GitHubRepository } from '@/types/github';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +7,7 @@ import { formatDistanceToNow } from 'date-fns';
 interface RepoCardProps {
   repo: GitHubRepository;
   onClick: () => void;
+  onAnalyze: (repo: string) => void;
   index: number;
 }
 
@@ -30,7 +30,7 @@ const languageColors: Record<string, string> = {
   HTML: 'bg-red-400',
 };
 
-export function RepoCard({ repo, onClick, index }: RepoCardProps) {
+export function RepoCard({ repo, onClick, onAnalyze, index }: RepoCardProps) {
   const updatedAt = formatDistanceToNow(new Date(repo.updated_at), { addSuffix: true });
   const langColor = repo.language ? languageColors[repo.language] || 'bg-gray-400' : '';
 
@@ -56,13 +56,16 @@ export function RepoCard({ repo, onClick, index }: RepoCardProps) {
             </div>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
-            <Link
-              to={`/import?repo=${encodeURIComponent(repo.full_name)}`}
-              onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20"
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAnalyze(repo.full_name);
+              }}
             >
               Analyze
-            </Link>
+            </Button>
             <Button
               variant="ghost"
               size="icon"
