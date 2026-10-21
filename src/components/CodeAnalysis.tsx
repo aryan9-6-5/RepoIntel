@@ -211,7 +211,7 @@ export default function CodeAnalysis({ repo, onClose }: { repo: string; onClose:
       )}
 
       {error && (
-        <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-red-400">
+        <p role="alert" className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-red-700 dark:text-red-400">
           {error}
         </p>
       )}
@@ -230,7 +230,7 @@ export default function CodeAnalysis({ repo, onClose }: { repo: string; onClose:
             <div className="space-y-3 rounded-lg border border-border bg-card p-4 text-sm">
               <MarkdownContent content={answer.answer} />
               {answer.commitSha !== result.commitSha && (
-                <p role="status" className="text-xs text-amber-500">The repository changed since you imported it: this answer uses the newer commit {answer.commitSha.slice(0, 7)} (imported {result.commitSha.slice(0, 7)}). Re-import to refresh the file list.</p>
+                <p role="status" className="text-xs text-amber-700 dark:text-amber-500">The repository changed since you imported it: this answer uses the newer commit {answer.commitSha.slice(0, 7)} (imported {result.commitSha.slice(0, 7)}). Re-import to refresh the file list.</p>
               )}
               <div className="flex flex-wrap gap-2">
                 {answer.citations.valid.map((c) => (
@@ -297,7 +297,7 @@ export default function CodeAnalysis({ repo, onClose }: { repo: string; onClose:
                   <Button size="sm" variant="outline" disabled={!!busy} onClick={() => loadOverview(true)}>
                     {busy === 'overview' ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : null}Generate architecture summary
                   </Button>
-                  {explorer.summaryError && <p role="alert" className="text-xs text-red-400">{explorer.summaryError}</p>}
+                  {explorer.summaryError && <p role="alert" className="text-xs text-red-700 dark:text-red-400">{explorer.summaryError}</p>}
                 </div>
               )}
             </div>
@@ -336,7 +336,7 @@ export default function CodeAnalysis({ repo, onClose }: { repo: string; onClose:
                 <div className="space-y-3 rounded-lg border border-border bg-card p-4 text-sm">
                   <h3 className="font-semibold text-foreground">Findings in <span className="font-mono text-xs">{analysis.path}</span></h3>
                   {analysis.llmStatus !== 'ok' && (
-                    <p role="status" className="text-xs text-amber-500">
+                    <p role="status" className="text-xs text-amber-700 dark:text-amber-500">
                       {analysis.llmStatus === 'error_429' ? 'AI analysis was rate limited by the free tier; only pattern checks ran. Try again in a minute.' : `AI analysis did not run (${analysis.llmStatus}); only pattern checks ran.`}
                     </p>
                   )}

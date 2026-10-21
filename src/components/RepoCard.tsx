@@ -36,7 +36,7 @@ export function RepoCard({ repo, onClick, onAnalyze, index }: RepoCardProps) {
 
   return (
     <div
-      className="glass-card glow-border p-5 cursor-pointer group transition-all duration-300 hover:scale-[1.01] hover:bg-card/90 animate-slide-up"
+      className="glass-card glow-border p-5 cursor-pointer group transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-primary/40 animate-slide-up"
       style={{ animationDelay: `${index * 50}ms` }}
       onClick={onClick}
     >
@@ -63,20 +63,21 @@ export function RepoCard({ repo, onClick, onAnalyze, index }: RepoCardProps) {
                 e.stopPropagation();
                 onAnalyze(repo.full_name);
               }}
+              className="h-8 px-3 text-xs font-medium"
             >
               Analyze
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
               onClick={(e) => {
                 e.stopPropagation();
                 window.open(repo.html_url, '_blank');
               }}
               title="Open on GitHub"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
+              <ExternalLink className="h-4 w-4" />
             </Button>
           </div>
         </div>

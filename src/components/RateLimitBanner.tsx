@@ -15,11 +15,11 @@ export function RateLimitBanner({ rateLimit }: RateLimitBannerProps) {
   return (
     <div className="glass-card p-4 border-amber-500/30 bg-amber-500/5 animate-fade-in">
       <div className="flex items-start gap-3">
-        <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+        <AlertCircle className="h-5 w-5 text-amber-700 dark:text-amber-500 shrink-0 mt-0.5" />
         <div className="flex-1">
           <p className="font-medium text-foreground">API Rate Limit Warning</p>
           <p className="text-sm text-muted-foreground mt-1">
-            You have <span className="font-medium text-amber-500">{rateLimit.remaining}</span> of{' '}
+            You have <span className="font-medium text-amber-700 dark:text-amber-500">{rateLimit.remaining}</span> of{' '}
             {rateLimit.limit} requests remaining.
           </p>
           <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">

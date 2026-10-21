@@ -34,7 +34,7 @@ export function CodeViewer({ repoId, commitSha, path, highlight }: Props) {
     hlRef.current?.scrollIntoView({ block: 'center' });
   }, [lines, highlight?.[0], highlight?.[1]]);
 
-  if (error) return <p role="alert" className="text-sm text-red-400">{error}</p>;
+  if (error) return <p role="alert" className="text-sm text-red-700 dark:text-red-400">{error}</p>;
   if (!lines) return <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-label="Loading file" />;
 
   return (

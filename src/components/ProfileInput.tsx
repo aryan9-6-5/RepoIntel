@@ -20,6 +20,13 @@ export function ProfileInput({ onSubmit, loading, compact }: ProfileInputProps) 
     }
   };
 
+  const handleQuickSelect = (val: string) => {
+    setInput(val);
+    if (!loading) {
+      onSubmit(val);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto">
       <div className="relative flex gap-3">
@@ -30,7 +37,7 @@ export function ProfileInput({ onSubmit, loading, compact }: ProfileInputProps) 
             placeholder="Username or owner/repo"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="pl-12 pr-4 h-14 text-base bg-card/60 border-border/60"
+            className="pl-12 pr-4 h-14 text-base bg-card border-border shadow-sm focus:border-primary/50"
             disabled={loading}
           />
         </div>
@@ -38,7 +45,8 @@ export function ProfileInput({ onSubmit, loading, compact }: ProfileInputProps) 
           type="submit"
           size="lg"
           disabled={!input.trim() || loading}
-          className="h-14 px-8"
+          aria-label="Fetch repos"
+          className="h-14 px-8 shadow-sm transition-transform active:scale-95"
         >
           {loading ? (
             <Loader2 className="h-5 w-5 animate-spin" />
@@ -48,11 +56,34 @@ export function ProfileInput({ onSubmit, loading, compact }: ProfileInputProps) 
           <span className="hidden sm:inline ml-2">Fetch Repos</span>
         </Button>
       </div>
-      {!compact && <p className="text-sm text-muted-foreground mt-3 text-center">
-        Try: <button type="button" onClick={() => setInput('torvalds')} className="text-primary hover:underline">torvalds</button>,{' '}
-        <button type="button" onClick={() => setInput('https://github.com/facebook')} className="text-primary hover:underline">facebook</button>, or{' '}
-        <button type="button" onClick={() => setInput('vercel')} className="text-primary hover:underline">vercel</button>
-      </p>}
+      {!compact && (
+        <p className="text-sm text-muted-foreground mt-3 text-center">
+          Try:{' '}
+          <button
+            type="button"
+            onClick={() => handleQuickSelect('torvalds')}
+            className="text-primary hover:underline font-medium rounded px-1 transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+          >
+            torvalds
+          </button>
+          ,{' '}
+          <button
+            type="button"
+            onClick={() => handleQuickSelect('https://github.com/facebook')}
+            className="text-primary hover:underline font-medium rounded px-1 transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+          >
+            facebook
+          </button>
+          , or{' '}
+          <button
+            type="button"
+            onClick={() => handleQuickSelect('vercel')}
+            className="text-primary hover:underline font-medium rounded px-1 transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+          >
+            vercel
+          </button>
+        </p>
+      )}
     </form>
   );
 }

@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function LoadingSkeleton() {
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in" role="status" aria-busy="true" aria-label="Loading repositories">
       {/* User profile skeleton */}
       <div className="glass-card p-6">
         <div className="flex items-center gap-5">

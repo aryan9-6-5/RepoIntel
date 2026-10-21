@@ -51,6 +51,7 @@ export function RepoFilters({
             value={filters.search}
             onChange={(e) => onFilterChange({ search: e.target.value })}
             className="pl-10 h-10"
+            aria-label="Search repositories"
           />
         </div>
         
@@ -59,7 +60,7 @@ export function RepoFilters({
             value={filters.language}
             onValueChange={(value) => onFilterChange({ language: value })}
           >
-            <SelectTrigger className="w-[160px] h-10 bg-secondary/50">
+            <SelectTrigger aria-label="Filter by language" className="w-[160px] h-10 bg-secondary/50">
               <SlidersHorizontal className="h-4 w-4 mr-2 text-muted-foreground" />
               <SelectValue placeholder="Language" />
             </SelectTrigger>
@@ -77,7 +78,7 @@ export function RepoFilters({
             value={filters.sortBy}
             onValueChange={(value) => onFilterChange({ sortBy: value as SortOption })}
           >
-            <SelectTrigger className="w-[180px] h-10 bg-secondary/50">
+            <SelectTrigger aria-label="Sort by" className="w-[180px] h-10 bg-secondary/50">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -94,7 +95,8 @@ export function RepoFilters({
             size="icon"
             onClick={toggleSortDirection}
             className="h-10 w-10"
-            title={filters.sortDirection === 'desc' ? 'Descending' : 'Ascending'}
+            title={filters.sortDirection === 'desc' ? 'Descending: switch to ascending' : 'Ascending: switch to descending'}
+            aria-label={filters.sortDirection === 'desc' ? 'Sort descending, switch to ascending' : 'Sort ascending, switch to descending'}
           >
             <ArrowUpDown className={`h-4 w-4 transition-transform ${filters.sortDirection === 'asc' ? 'rotate-180' : ''}`} />
           </Button>
@@ -106,9 +108,20 @@ export function RepoFilters({
         </div>
       </div>
       
-      <div className="mt-3 text-sm text-muted-foreground">
-        Showing <span className="font-medium text-foreground">{filteredCount}</span> of{' '}
-        <span className="font-medium text-foreground">{totalRepos}</span> repositories
+      <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground flex-wrap gap-2">
+        <div role="status" aria-live="polite">
+          Showing <span className="font-medium text-foreground">{filteredCount}</span> of{' '}
+          <span className="font-medium text-foreground">{totalRepos}</span> repositories
+        </div>
+        {(filters.search || filters.language !== 'all') && (
+          <button
+            type="button"
+            onClick={() => onFilterChange({ search: '', language: 'all' })}
+            className="text-xs text-primary hover:underline font-medium"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
     </div>
   );

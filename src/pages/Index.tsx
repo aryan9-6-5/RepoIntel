@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useMemo, useCallback } from 'react';
+import { lazy, Suspense, useState, useMemo, useCallback, useRef } from 'react';
 import { Github } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { ProfileInput } from '@/components/ProfileInput';
@@ -9,6 +9,7 @@ import { RepoDetailModal } from '@/components/RepoDetailModal';
 import { RateLimitBanner } from '@/components/RateLimitBanner';
 import { EmptyState } from '@/components/EmptyState';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { useGitHubApi } from '@/hooks/useGitHubApi';
 import { GitHubRepository, GitHubUser, FilterState } from '@/types/github';
 import { parseRepoRef } from '../../supabase/functions/_shared/repoUrl';
@@ -47,7 +48,9 @@ export default function Index() {
     setError,
   } = useGitHubApi();
 
+  const lastQuery = useRef('');
   const handleSearch = async (input: string) => {
+    lastQuery.current = input;
     // owner/repo or a github.com/owner/repo URL opens code analysis; a bare name is a profile
     const repoRef = parseRepoRef(input);
     if (repoRef) {
@@ -146,6 +149,16 @@ export default function Index() {
 
   const totalPages = Math.ceil(filteredAndSortedRepos.length / REPOS_PER_PAGE);
 
+  const clearFilters = useCallback(() => {
+    setFilters((prev) => ({ ...prev, search: '', language: 'all' }));
+    setCurrentPage(1);
+  }, []);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    document.getElementById('repo-results')?.scrollIntoView({ block: 'start' });
+  };
+
   const handleFilterChange = useCallback((newFilters: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
     setCurrentPage(1);
@@ -171,13 +184,16 @@ export default function Index() {
   };
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background text-foreground transition-colors">
       {/* Hero Section */}
       <section className={`relative overflow-hidden ${analyzeRepo ? 'py-6' : 'py-16 md:py-24'}`}>
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl opacity-20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl opacity-20 pointer-events-none" />
         
         <div className="container relative z-10 px-4 mx-auto">
+          <div className="flex justify-end mb-2">
+            <ThemeToggle />
+          </div>
           {analyzeRepo ? (
             <h1 className="sr-only">GitHub Repo Explorer</h1>
           ) : (
@@ -186,7 +202,7 @@ export default function Index() {
                 <Github className="w-8 h-8 text-primary" />
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-                <span className="text-gradient">GitHub</span> Repo Explorer
+                <span className="text-primary">GitHub</span> Repo Explorer
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 Discover and explore public repositories from any GitHub profile,
@@ -212,7 +228,7 @@ export default function Index() {
         {!analyzeRepo && loading && <LoadingSkeleton />}
 
         {!analyzeRepo && error && !loading && (
-          <EmptyState type="error" message={error} />
+          <EmptyState type="error" message={error} action={{ label: 'Try again', onClick: () => lastQuery.current && handleSearch(lastQuery.current) }} />
         )}
 
         {!analyzeRepo && !loading && !error && user && (
@@ -232,7 +248,7 @@ export default function Index() {
 
                 {filteredAndSortedRepos.length > 0 ? (
                   <>
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <div id="repo-results" className="grid gap-4 md:grid-cols-2 scroll-mt-4">
                       {paginatedRepos.map((repo, index) => (
                         <RepoCard
                           key={repo.id}
@@ -246,9 +262,9 @@ export default function Index() {
 
                     {/* Pagination */}
                     {totalPages > 1 && (
-                      <div className="flex items-center justify-center gap-2 pt-6">
+                      <nav aria-label="Pagination" className="flex items-center justify-center gap-2 pt-6">
                         <button
-                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                          onClick={() => goToPage(Math.max(1, currentPage - 1))}
                           disabled={currentPage === 1}
                           className="px-4 py-2 text-sm font-medium rounded-lg bg-secondary text-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors"
                         >
@@ -269,7 +285,9 @@ export default function Index() {
                             return (
                               <button
                                 key={pageNum}
-                                onClick={() => setCurrentPage(pageNum)}
+                                onClick={() => goToPage(pageNum)}
+                                aria-label={`Page ${pageNum}`}
+                                aria-current={currentPage === pageNum ? 'page' : undefined}
                                 className={`w-10 h-10 text-sm font-medium rounded-lg transition-colors ${
                                   currentPage === pageNum
                                     ? 'bg-primary text-primary-foreground'
@@ -282,17 +300,17 @@ export default function Index() {
                           })}
                         </div>
                         <button
-                          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                          onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
                           disabled={currentPage === totalPages}
                           className="px-4 py-2 text-sm font-medium rounded-lg bg-secondary text-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:bg-secondary/80 transition-colors"
                         >
                           Next
                         </button>
-                      </div>
+                      </nav>
                     )}
                   </>
                 ) : (
-                  <EmptyState type="no-results" />
+                  <EmptyState type="no-results" action={{ label: 'Clear filters', onClick: clearFilters }} />
                 )}
               </>
             ) : (
